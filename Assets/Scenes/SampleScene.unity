@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorTileMap: {fileID: 477287820}
+  floorTile: {fileID: 11400000, guid: 471853985ed4b5242ad12af71ace0cf6, type: 2}
 --- !u!4 &172064602
 Transform:
   m_ObjectHideFlags: 0
@@ -248,8 +249,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 467351713}
-        m_TargetAssemblyTypeName: RandomWalkDungeonGenerator, Assembly-CSharp
-        m_MethodName: RunProceduralGeneration
+        m_TargetAssemblyTypeName: AbstractDungeonGenerator, Assembly-CSharp
+        m_MethodName: GenerateDungeon
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -326,11 +327,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99b8789df5589c64faa0aca2da7dba5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileMapDisplayer: {fileID: 172064601}
   startPosition: {x: 0, y: 0}
   iterations: 1
   walkLength: 10
   startRandomly: 1
-  tileMapDisplayer: {fileID: 0}
 --- !u!4 &467351714
 Transform:
   m_ObjectHideFlags: 0
