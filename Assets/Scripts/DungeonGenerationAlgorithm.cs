@@ -33,6 +33,6 @@ public static class Directions2D
 
     public static Vector2Int GetRandomDirection()
     {
-        return directionsList[Random.Range(0, directionsList.Count -1)];
+        return directionsList[Random.Range(0, directionsList.Count )];
     }
  }

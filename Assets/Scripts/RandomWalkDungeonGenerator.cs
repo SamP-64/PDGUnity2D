@@ -8,15 +8,9 @@ using Random = UnityEngine.Random;
 
 public class RandomWalkDungeonGenerator : AbstractDungeonGenerator
 {
-  
-    [SerializeField]
-    private int iterations = 10;
 
     [SerializeField]
-    public int walkLength = 10;
-
-    [SerializeField]
-    public bool startRandomly = true;
+    private RandomWalkData randomWalkParameters;
 
 
     protected override void RunProceduralGeneration()
@@ -24,7 +18,7 @@ public class RandomWalkDungeonGenerator : AbstractDungeonGenerator
         HashSet<Vector2Int> floorPositions = RunRandomWalk();
         tileMapDisplayer.ClearTileMap();
         tileMapDisplayer.PaintFloorTiles(floorPositions);
-
+        WallGenerator.CreateWalls(floorPositions, tileMapDisplayer);
 
         foreach (var position in floorPositions)
         {
@@ -38,12 +32,12 @@ public class RandomWalkDungeonGenerator : AbstractDungeonGenerator
 
         HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
 
-        for (int i = 0; i < iterations; i++)
+        for (int i = 0; i < randomWalkParameters.iterations; i++)
         {
-            var path = DungeonGeneration.RandomWalk(currentPosition , walkLength);
+            var path = DungeonGeneration.RandomWalk(currentPosition , randomWalkParameters.walkLength);
             floorPositions.UnionWith(path);
 
-            if(startRandomly)
+            if(randomWalkParameters.startRandomly)
             {
                 currentPosition = floorPositions.ElementAt(Random.Range(0, floorPositions.Count));
             }
