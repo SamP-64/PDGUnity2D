@@ -19,6 +19,22 @@ public static class DungeonGeneration
 
         return path;
     }
+
+    public static List<Vector2Int> CreateCorridor(Vector2Int startPosition, int length)
+    {
+        List<Vector2Int> corridor = new List<Vector2Int>();
+        var direction = Directions2D .GetRandomDirection();
+        var currentPosition = startPosition;
+        corridor.Add(currentPosition);
+
+        for (int i = 0; i < length; i++) 
+        {
+            currentPosition += direction;
+            corridor.Add(currentPosition);
+        }
+
+        return corridor;
+    }
 }
 
 public static class Directions2D
