@@ -10,6 +10,12 @@ public class TileMapDisplayer : MonoBehaviour
     [SerializeField] private TileBase floorTile;
     [SerializeField] private TileBase WallTile;
 
+    [SerializeField]
+    private TileBase wallTop, wallSideRight, wallSideLeft, wallBottom, wallFull,
+       wallInnerCornerDownLeft, wallInnerCornerDownRight,
+       wallDiagonalCornerDownRight, wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft;
+
+
     public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions)
     {
         PaintFloorTiles(floorPositions, floorTileMap, floorTile);
@@ -35,8 +41,76 @@ public class TileMapDisplayer : MonoBehaviour
         wallTileMap.ClearAllTiles();
     }
 
-    internal void PaintBasicWall(Vector2Int position)
+    internal void PaintBasicWall(Vector2Int position, string neighboursValue)
     {
-        PaintSingleTile(wallTileMap, WallTile , position);
+        int valueToInt = Convert.ToInt32(neighboursValue, 2); // convert the binary value to int
+        TileBase tile = null;
+
+        if(WallTypeFinder.wallTop.Contains(valueToInt ))
+        {
+            tile = wallTop;
+        }
+        else if (WallTypeFinder.wallSideRight.Contains(valueToInt))
+        {
+            tile = wallSideRight;
+        }
+        else if (WallTypeFinder.wallSideLeft.Contains(valueToInt))
+        {
+            tile = wallSideLeft;
+        }
+        else if (WallTypeFinder.wallBottm.Contains(valueToInt))
+        {
+            tile = wallBottom;
+        }
+        else if (WallTypeFinder.wallFull.Contains(valueToInt))
+        {
+            tile = wallFull;
+        }
+
+        if (tile!=null)
+
+        PaintSingleTile(wallTileMap, tile , position);
+    }
+
+    internal void PaintCornerWall(Vector2Int position, string neighboursValue)
+    {
+        int typeASInt = Convert.ToInt32(neighboursValue, 2);
+        TileBase tile = null;
+
+        if (WallTypeFinder.wallInnerCornerDownLeft.Contains(typeASInt))
+        {
+            tile = wallInnerCornerDownLeft;
+        }
+        else if (WallTypeFinder.wallInnerCornerDownRight.Contains(typeASInt))
+        {
+            tile = wallInnerCornerDownRight;
+        }
+        else if (WallTypeFinder.wallDiagonalCornerDownLeft.Contains(typeASInt))
+        {
+            tile = wallDiagonalCornerDownLeft;
+        }
+        else if (WallTypeFinder.wallDiagonalCornerDownRight.Contains(typeASInt))
+        {
+            tile = wallDiagonalCornerDownRight;
+        }
+        else if (WallTypeFinder.wallDiagonalCornerUpRight.Contains(typeASInt))
+        {
+            tile = wallDiagonalCornerUpRight;
+        }
+        else if (WallTypeFinder.wallDiagonalCornerUpLeft.Contains(typeASInt))
+        {
+            tile = wallDiagonalCornerUpLeft;
+        }
+        else if (WallTypeFinder.wallAllDirections.Contains(typeASInt))
+        {
+            tile = wallFull;
+        }
+        else if (WallTypeFinder.wallBottomEightDirections.Contains(typeASInt))
+        {
+            tile = wallBottom;
+        }
+
+        if (tile != null)
+            PaintSingleTile(wallTileMap, tile, position);
     }
 }

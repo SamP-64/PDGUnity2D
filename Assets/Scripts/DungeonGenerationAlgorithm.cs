@@ -124,6 +124,27 @@ public static class Directions2D
         new Vector2Int(-1,0) //left
     };
 
+    public static List<Vector2Int> diagonalDirectionsList = new List<Vector2Int>
+    {
+        new Vector2Int(1,1), //up right
+        new Vector2Int(1,-1), //right down
+        new Vector2Int(-1,-1), //down left
+        new Vector2Int(-1,1) //left up
+    };
+
+    public static List<Vector2Int> allDirectionsList = new List<Vector2Int>
+    {
+        new Vector2Int(0,1), //up
+        new Vector2Int(1,1), //up right
+        new Vector2Int(1,0), //right
+        new Vector2Int(1,-1), //right down
+        new Vector2Int(0,-1), //down
+        new Vector2Int(-1,-1), //down left
+        new Vector2Int(-1,0), //left
+        new Vector2Int(-1,1) //left up 
+    };
+
+
     public static Vector2Int GetRandomDirection()
     {
         return directionsList[Random.Range(0, directionsList.Count )];
