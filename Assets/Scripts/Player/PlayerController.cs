@@ -19,4 +19,19 @@ public class PlayerController : MonoBehaviour
         speedY = Input.GetAxis("Vertical") * moveSpeed;
         rigidbody2D.linearVelocity = new Vector2 (speedX, speedY);
     }
+
+
+    public int score = 0;
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        Coin coin = other.GetComponent<Coin>();
+
+        if (coin != null)
+        {
+            Destroy(other.gameObject);
+            Debug.Log("Score: " + score);
+        }
+    }
+
 }
