@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class TileMapDisplayer : MonoBehaviour
 {
-  [SerializeField] private Tilemap floorTileMap, wallTileMap;
+  [SerializeField] private Tilemap floorTileMap, wallTileMap, itemTileMap;
 
     [SerializeField] private TileBase floorTile;
     [SerializeField] private TileBase WallTile;
@@ -15,10 +15,21 @@ public class TileMapDisplayer : MonoBehaviour
        wallInnerCornerDownLeft, wallInnerCornerDownRight,
        wallDiagonalCornerDownRight, wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft;
 
+    [SerializeField] private TileBase coinTile;
+
 
     public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions)
     {
         PaintFloorTiles(floorPositions, floorTileMap, floorTile);
+    }
+
+    public void PaintCoinTiles(IEnumerable<Vector2Int> floorPositions)
+    {
+        foreach (var position in floorPositions)
+        {
+            PaintSingleTile(itemTileMap, coinTile, position);
+        }
+       
     }
 
     private void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Tilemap floorTileMap, TileBase floorTile)
@@ -39,6 +50,7 @@ public class TileMapDisplayer : MonoBehaviour
     {
         floorTileMap.ClearAllTiles();
         wallTileMap.ClearAllTiles();
+        itemTileMap.ClearAllTiles();
     }
 
     internal void PaintBasicWall(Vector2Int position, string neighboursValue)

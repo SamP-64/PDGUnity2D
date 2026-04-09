@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 public class RoomFirstDG : RandomWalkDungeonGenerator
@@ -32,6 +33,8 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         );
 
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
+        HashSet<Vector2Int> coins = new HashSet<Vector2Int>();
+
 
         if (randomWalkRooms)
         {
@@ -46,6 +49,9 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         foreach (var room in roomsList)
         {
             roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
+
+            Debug.Log("Painted COin");
+            coins.Add(new Vector2Int(Mathf.RoundToInt(room.center.x), Mathf.RoundToInt(room.center.y)));
         }
 
         HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
@@ -53,6 +59,9 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
         tileMapDisplayer.PaintFloorTiles(floor);
         WallGenerator.CreateWalls(floor, tileMapDisplayer);
+
+        tileMapDisplayer.PaintCoinTiles(coins);
+
     }
 
     private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomsList)
