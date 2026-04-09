@@ -64,7 +64,8 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
         }
 
-        SpawnPlayerInRoom(player, 0 , roomsList, floor);
+        SpawnPlayerInRoom( 0 , roomsList, floor);
+
         SpawnInRoom(stairs, roomsList.Count - 1, roomsList, floor);
 
         HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
@@ -78,7 +79,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
        
 
     }
-    private void SpawnPlayerInRoom(GameObject obj, int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
+    private void SpawnPlayerInRoom(int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
     {
         BoundsInt firstRoom = roomsList[0]; // first room
         List<Vector2Int> firstRoomFloors = new List<Vector2Int>();
@@ -97,8 +98,10 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         Vector2Int spawnTile = firstRoomFloors[Random.Range(0, firstRoomFloors.Count)];
 
         // Set the player's position
-        player.transform.position = new Vector3(spawnTile.x, spawnTile.y, 0f);
+        player.transform.position = new Vector3(spawnTile.x + 0.5f, spawnTile.y + 0.5f, 0f);
         Debug.Log("spawned player");
+        Debug.Log(spawnTile.y);
+        Debug.Log(spawnTile.x );
 
     }
     private void SpawnInRoom(GameObject obj, int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
@@ -138,7 +141,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         Vector2Int spawnTile = roomFloors[Random.Range(0, roomFloors.Count)];
 
         // Spawn the object at that position
-        Instantiate( obj, new Vector3(spawnTile.x, spawnTile.y, 0f), Quaternion.identity);
+        Instantiate( obj, new Vector3(spawnTile.x + 0.5f, spawnTile.y + 0.5f, 0f), Quaternion.identity);
 
         Debug.Log("spawned");
     }

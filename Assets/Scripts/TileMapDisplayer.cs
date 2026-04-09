@@ -28,7 +28,7 @@ public class TileMapDisplayer : MonoBehaviour
     {
         foreach (var position in floorPositions)
         {
-            Vector3 pos = new Vector3(position.x, position.y, 0f);
+            Vector3 pos = new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
             Instantiate(coin, pos, Quaternion.identity);
         }
        
@@ -40,7 +40,7 @@ public class TileMapDisplayer : MonoBehaviour
         {
             PaintSingleTile(floorTileMap, floorTile, position);
             Dungeon.Grid[position.x, position.y].floor = true;
-            Instantiate(coin, new Vector3(position.x, position.y, 0f), Quaternion.identity);
+            Instantiate(coin, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
         } 
     }
 
@@ -57,11 +57,11 @@ public class TileMapDisplayer : MonoBehaviour
         floorTileMap.ClearAllTiles();
         wallTileMap.ClearAllTiles();
 
-        Coin[] coins = FindObjectsOfType<Coin>();
+        Spawnable[] spawnables = FindObjectsOfType<Spawnable>();
 
-        foreach (Coin coin in coins)
+        foreach (Spawnable item in spawnables)
         {
-            Destroy(coin.gameObject);
+            Destroy(item.gameObject);
         }
     }
 
