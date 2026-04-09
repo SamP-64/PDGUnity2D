@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
@@ -19,8 +20,12 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     [Range(0, 10)]
     private int roomOffset = 1;
 
+    [SerializeField]
+    private GameObject player;
+
     protected override void RunProceduralGeneration()
     {
+         
         CreateRooms();
     }
 
@@ -46,11 +51,11 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         }
 
         List<Vector2Int> roomCenters = new List<Vector2Int>();
+
         foreach (var room in roomsList)
         {
             roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
 
-            Debug.Log("Painted COin");
             coins.Add(new Vector2Int(Mathf.RoundToInt(room.center.x), Mathf.RoundToInt(room.center.y)));
         }
 
@@ -61,6 +66,24 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         WallGenerator.CreateWalls(floor, tileMapDisplayer);
 
         tileMapDisplayer.PaintCoinTiles(coins);
+
+
+        BoundsInt firstRoom = roomsList[0]; // first room
+        List<Vector2Int> firstRoomFloors = new List<Vector2Int>();
+
+
+        foreach (var tile in floor)
+        {
+            // check if the tile is within the BSP room bounds
+            if (tile.x >= firstRoom.xMin && tile.x < firstRoom.xMax &&
+                tile.y >= firstRoom.yMin && tile.y < firstRoom.yMax)
+            {
+                firstRoomFloors.Add(tile);
+            }
+        }
+
+        Vector2Int spawnTile = firstRoomFloors[Random.Range(0, firstRoomFloors.Count)];
+        player.transform.position = new Vector3(spawnTile.x, spawnTile.y, 0f);
 
     }
 

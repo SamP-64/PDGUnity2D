@@ -6,18 +6,19 @@ public class PlayerController : MonoBehaviour
 
     public float moveSpeed;
     public float speedX, speedY;
-    Rigidbody2D rigidbody2D;
+    Rigidbody2D rb;
     void Start()
     {
-        rigidbody2D = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        speedX = Input.GetAxis("Horizontal") * moveSpeed;
-        speedY = Input.GetAxis("Vertical") * moveSpeed;
-        rigidbody2D.linearVelocity = new Vector2 (speedX, speedY);
+        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+        Vector2 movement = input * moveSpeed * Time.fixedDeltaTime;
+
+        rb.MovePosition(rb.position + movement);
     }
 
 
