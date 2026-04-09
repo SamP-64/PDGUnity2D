@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed;
     public float speedX, speedY;
     Rigidbody2D rb;
+    public RoomFirstDG dungeonGenerator;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -27,11 +28,17 @@ public class PlayerController : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         Coin coin = other.GetComponent<Coin>();
+        Stairs stairs = other.GetComponent<Stairs>();
 
         if (coin != null)
         {
             Destroy(other.gameObject);
             Debug.Log("Score: " + score);
+        }
+
+        if (stairs != null)
+        {
+            dungeonGenerator.GenerateDungeon();
         }
     }
 

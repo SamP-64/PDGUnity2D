@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static UnityEditor.PlayerSettings;
 
 public class TileMapDisplayer : MonoBehaviour
 {
@@ -38,6 +39,8 @@ public class TileMapDisplayer : MonoBehaviour
         foreach (var position in floorPositions) 
         {
             PaintSingleTile(floorTileMap, floorTile, position);
+            Dungeon.Grid[position.x, position.y].floor = true;
+            Instantiate(coin, new Vector3(position.x, position.y, 0f), Quaternion.identity);
         } 
     }
 
@@ -45,6 +48,8 @@ public class TileMapDisplayer : MonoBehaviour
     {
         var tilePosition = floorTileMap.WorldToCell((Vector3Int) position);
         floorTileMap.SetTile(tilePosition, floorTile);
+
+        
     }
 
     public void ClearTileMap()

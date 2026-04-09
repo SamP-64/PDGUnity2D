@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.PlayerSettings;
 using Random = UnityEngine.Random;
 
 public class RoomFirstDG : RandomWalkDungeonGenerator
@@ -23,9 +24,12 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     [SerializeField]
     private GameObject player;
 
+    [SerializeField]
+    private GameObject stairs;
+
     protected override void RunProceduralGeneration()
     {
-         
+        Dungeon.Initialize(dungeonHeight , dungeonWidth );
         CreateRooms();
     }
 
@@ -57,7 +61,11 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
 
             coins.Add(new Vector2Int(Mathf.RoundToInt(room.center.x), Mathf.RoundToInt(room.center.y)));
+
         }
+
+        SpawnPlayerInRoom(player, 0 , roomsList, floor);
+        SpawnInRoom(stairs, roomsList.Count - 1, roomsList, floor);
 
         HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
         floor.UnionWith(corridors);
@@ -67,14 +75,17 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
         tileMapDisplayer.PaintCoinTiles(coins);
 
+       
 
+    }
+    private void SpawnPlayerInRoom(GameObject obj, int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
+    {
         BoundsInt firstRoom = roomsList[0]; // first room
         List<Vector2Int> firstRoomFloors = new List<Vector2Int>();
 
-
         foreach (var tile in floor)
         {
-            // check if the tile is within the BSP room bounds
+            // Check if the tile is within the BSP room bounds
             if (tile.x >= firstRoom.xMin && tile.x < firstRoom.xMax &&
                 tile.y >= firstRoom.yMin && tile.y < firstRoom.yMax)
             {
@@ -82,10 +93,56 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             }
         }
 
+        // Pick a random floor tile inside the room
         Vector2Int spawnTile = firstRoomFloors[Random.Range(0, firstRoomFloors.Count)];
+
+        // Set the player's position
         player.transform.position = new Vector3(spawnTile.x, spawnTile.y, 0f);
+        Debug.Log("spawned player");
 
     }
+    private void SpawnInRoom(GameObject obj, int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
+    {
+
+
+        Debug.Log("!");
+
+        // Make sure the room exists
+        if (roomIndex < 0 || roomIndex >= roomsList.Count)
+        {
+            Debug.Log("Room index out of range!");
+            return;
+        }
+
+        BoundsInt room = roomsList[roomIndex];
+
+        // Find all actual floor tiles inside this room
+        List<Vector2Int> roomFloors = new List<Vector2Int>();
+        foreach (var tile in floor)
+        {
+            if (tile.x >= room.xMin && tile.x < room.xMax &&
+                tile.y >= room.yMin && tile.y < room.yMax)
+            {
+                roomFloors.Add(tile);
+            }
+        }
+
+        // Make sure there are valid floor tiles
+        if (roomFloors.Count == 0)
+        {
+            Debug.Log("No floor tiles in this room!");
+            return;
+        }
+
+        // Pick a random floor tile
+        Vector2Int spawnTile = roomFloors[Random.Range(0, roomFloors.Count)];
+
+        // Spawn the object at that position
+        Instantiate( obj, new Vector3(spawnTile.x, spawnTile.y, 0f), Quaternion.identity);
+
+        Debug.Log("spawned");
+    }
+
 
     private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomsList)
     {
