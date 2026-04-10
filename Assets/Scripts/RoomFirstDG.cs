@@ -27,8 +27,10 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     [SerializeField]
     private GameObject stairs;
 
+
     protected override void RunProceduralGeneration()
     {
+
         Dungeon.Initialize(dungeonHeight , dungeonWidth );
         tileMapDisplayer.ClearTileMap();
         CreateRooms();

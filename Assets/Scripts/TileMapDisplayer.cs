@@ -39,8 +39,8 @@ public class TileMapDisplayer : MonoBehaviour
         foreach (var position in floorPositions) 
         {
             PaintSingleTile(floorTileMap, floorTile, position);
-            Dungeon.Grid[position.x, position.y].floor = true;
-            Instantiate(coin, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
+            Dungeon.Grid[position.x, position.y].cellType = CellType.Floor;
+          //  Instantiate(coin, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
         } 
     }
 
@@ -92,6 +92,9 @@ public class TileMapDisplayer : MonoBehaviour
         if (tile!=null)
 
         PaintSingleTile(wallTileMap, tile , position);
+        Dungeon.Grid[position.x, position.y].cellType = CellType.Wall;
+        Instantiate(coin, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
+
     }
 
     internal void PaintCornerWall(Vector2Int position, string neighboursValue)
@@ -134,5 +137,8 @@ public class TileMapDisplayer : MonoBehaviour
 
         if (tile != null)
             PaintSingleTile(wallTileMap, tile, position);
+        Dungeon.Grid[position.x, position.y].cellType = CellType.Wall;
+        Instantiate(coin, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
+
     }
 }

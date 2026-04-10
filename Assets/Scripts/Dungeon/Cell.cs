@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Cell 
 {
-    public bool floor = false;
+    public bool traversed = false;
+    public CellType cellType;
     public float roomNum;
 }
