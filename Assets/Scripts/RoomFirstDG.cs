@@ -186,10 +186,10 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
                 {
                     floor.Add(position);
                     Dungeon.Grid[position.x, position.y].roomNum = i + 1;
-                    if(Dungeon.Grid[position.x, position.y].roomNum == 2)
-                    {
-                        Instantiate(stairs, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
-                    }
+                    //if(Dungeon.Grid[position.x, position.y].roomNum == 2)
+                    //{
+                    //    Instantiate(stairs, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
+                    //}
                    
 
                 }

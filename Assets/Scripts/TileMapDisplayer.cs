@@ -48,8 +48,6 @@ public class TileMapDisplayer : MonoBehaviour
     {
         var tilePosition = floorTileMap.WorldToCell((Vector3Int) position);
         floorTileMap.SetTile(tilePosition, floorTile);
-
-        
     }
 
     public void ClearTileMap()

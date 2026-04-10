@@ -27,19 +27,18 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Coin coin = other.GetComponent<Coin>();
-        Stairs stairs = other.GetComponent<Stairs>();
 
-        if (coin != null)
+        if (other.TryGetComponent(out Coin coin))
         {
             Destroy(other.gameObject);
-            Debug.Log("Score: " + score);
+            // Debug.Log("Score: " + score);
+            return;
         }
 
-        if (stairs != null)
+        if (other.TryGetComponent(out Stairs stairs))
         {
-            dungeonGenerator.GenerateDungeon();
+            Debug.Log(other.name);
+            GameManager.Instance.NextFloor(dungeonGenerator);
         }
     }
-
 }

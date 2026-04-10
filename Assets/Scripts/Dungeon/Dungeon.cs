@@ -2,11 +2,10 @@ using UnityEngine;
 
 public static class Dungeon
 {
-    // Static means you can access this from any script: Dungeon.Grid[x, y]
-    public static Cell[,] Grid;
+    
+    public static Cell[,] Grid; // access any tile through Dungeon.Grid[x, y]
 
-    // Optional helper to initialize the grid
-    public static void Initialize(int width, int height)
+    public static void Initialize(int width, int height)  // Optional helper to initialize the grid
     {
         Grid = new Cell[width, height];
         for (int x = 0; x < width; x++)
@@ -14,7 +13,6 @@ public static class Dungeon
             for (int y = 0; y < height; y++)
             {
                 Grid[x, y] = new Cell();
-                Debug.Log(x + " " + y);
             }
         }
     }
