@@ -14,6 +14,7 @@ public static class Dungeon
             for (int y = 0; y < height; y++)
             {
                 Grid[x, y] = new Cell();
+                Debug.Log(x + " " + y);
             }
         }
     }

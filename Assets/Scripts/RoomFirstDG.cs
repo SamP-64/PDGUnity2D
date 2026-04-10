@@ -30,6 +30,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     protected override void RunProceduralGeneration()
     {
         Dungeon.Initialize(dungeonHeight , dungeonWidth );
+        tileMapDisplayer.ClearTileMap();
         CreateRooms();
     }
 
@@ -184,6 +185,13 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
                     position.y <= (roomBounds.yMax - roomOffset))
                 {
                     floor.Add(position);
+                    Dungeon.Grid[position.x, position.y].roomNum = i + 1;
+                    if(Dungeon.Grid[position.x, position.y].roomNum == 2)
+                    {
+                        Instantiate(stairs, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
+                    }
+                   
+
                 }
             }
         }
