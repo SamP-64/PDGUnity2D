@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class PlayerController : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class PlayerController : MonoBehaviour
     public float speedX, speedY;
     Rigidbody2D rb;
     public RoomFirstDG dungeonGenerator;
+
+    [SerializeField] MiniMap MiniMap;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -32,13 +36,17 @@ public class PlayerController : MonoBehaviour
 
         if (currentCell != lastCell)
         {
+
+
+            Dungeon.Grid[lastCell.x, lastCell.y].cellType = CellType.Empty;
+            lastCell = currentCell;
+
             if (cellX >= 0 && cellX <= 40 && cellY >= 0 && cellY <= 40)
             {
                 RevealAroundPlayer(cellX, cellY);
+                MiniMap.DrawMinimap();
             }
 
-            Dungeon.Grid[lastCell.x ,lastCell.y ].cellType = CellType.Empty;
-            lastCell = currentCell;
            
         }
     }
@@ -73,6 +81,13 @@ public class PlayerController : MonoBehaviour
 
         if (other.TryGetComponent(out Coin coin))
         {
+           
+
+            Vector2 pos = other.transform.position;
+            int x = Mathf.FloorToInt(pos.x);
+            int y = Mathf.FloorToInt(pos.y);
+
+            Dungeon.Grid[x, y].cellType = CellType.Floor;
             Destroy(other.gameObject);
             // Debug.Log("Score: " + score);
             return;

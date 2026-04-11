@@ -5448,6 +5448,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2607079676019455260, guid: 45010d36954edea4ca3f1fb8a74ce282, type: 3}
+      propertyPath: MiniMap
+      value: 
+      objectReference: {fileID: 1124234163}
+    - target: {fileID: 2607079676019455260, guid: 45010d36954edea4ca3f1fb8a74ce282, type: 3}
       propertyPath: dungeonGenerator
       value: 
       objectReference: {fileID: 986286115}

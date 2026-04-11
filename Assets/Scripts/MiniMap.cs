@@ -11,20 +11,19 @@ public class MiniMap : MonoBehaviour
 
     private void Start()
     {
+        InitializeMinimap();
     }
-    public void DrawMinimap()
+
+    private Image[,] minimapTiles;
+
+    void InitializeMinimap()
     {
-        foreach (Transform child in minimapParent)
-        {
-            Destroy(child.gameObject);
-        }
+        minimapTiles = new Image[40, 40];
 
         for (int x = 0; x < 40; x++)
         {
             for (int y = 0; y < 40; y++)
             {
-                Cell cell = Dungeon.Grid[x, y];
-
                 GameObject tile = Instantiate(tilePrefab, minimapParent);
                 RectTransform rect = tile.GetComponent<RectTransform>();
                 Image image = tile.GetComponent<Image>();
@@ -32,27 +31,44 @@ public class MiniMap : MonoBehaviour
                 rect.anchoredPosition = new Vector2(x * tileSize, y * tileSize);
                 rect.sizeDelta = new Vector2(tileSize, tileSize);
 
-                if (cell.traversed == false) { continue; }
+                minimapTiles[x, y] = image;
+            }
+        }
+    }
+    public void DrawMinimap()
+    {
+        for (int x = 0; x < 40; x++)
+        {
+            for (int y = 0; y < 40; y++)
+            {
+                Cell cell = Dungeon.Grid[x, y];
 
-                if (cell.cellType == CellType.Wall)
+                if (!cell.traversed)
                 {
-                    image.color = Color.red;
+                    minimapTiles[x, y].color = Color.clear;
+                    continue;
                 }
-                else if (cell.cellType == CellType.player)
+
+                switch (cell.cellType)
                 {
-                    image.color = Color.white;
-                }
-                else if (cell.cellType == CellType.Coin)
-                {
-                    image.color = Color.yellow;
-                }
-                else if (cell.cellType == CellType.Stairs )
-                {
-                    image.color = Color.blue;
-                }
-                else
-                {
-                    image.color = Color.clear;
+                    case CellType.Wall:
+                        minimapTiles[x, y].color = Color.red;
+                        break;
+                    case CellType.player:
+                        minimapTiles[x, y].color = Color.white;
+                        break;
+                    case CellType.Coin:
+                        minimapTiles[x, y].color = Color.yellow;
+                        break;
+                    case CellType.Stairs:
+                        minimapTiles[x, y].color = Color.blue;
+                        break;
+                    case CellType.Empty:
+                        minimapTiles[x, y].color = Color.clear;
+                        break;
+                    default:
+                        minimapTiles[x, y].color = Color.clear;
+                        break;
                 }
             }
         }
