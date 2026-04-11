@@ -30,6 +30,7 @@ public class TileMapDisplayer : MonoBehaviour
         {
             Vector3 pos = new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
             Instantiate(coin, pos, Quaternion.identity);
+            Dungeon.Grid[position.x, position.y].cellType = CellType.Coin;
         }
        
     }

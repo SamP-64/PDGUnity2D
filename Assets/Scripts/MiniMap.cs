@@ -42,6 +42,14 @@ public class MiniMap : MonoBehaviour
                 {
                     image.color = Color.white;
                 }
+                else if (cell.cellType == CellType.Coin)
+                {
+                    image.color = Color.yellow;
+                }
+                else if (cell.cellType == CellType.Stairs )
+                {
+                    image.color = Color.blue;
+                }
                 else
                 {
                     image.color = Color.clear;

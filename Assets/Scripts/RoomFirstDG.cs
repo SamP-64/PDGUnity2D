@@ -69,7 +69,6 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
         SpawnPlayerInRoom( 0 , roomsList, floor);
 
-        SpawnInRoom(stairs, roomsList.Count - 1, roomsList, floor);
 
         HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
         floor.UnionWith(corridors);
@@ -79,7 +78,8 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
         tileMapDisplayer.PaintCoinTiles(coins);
 
-       
+        SpawnInRoom(stairs, roomsList.Count - 1, roomsList, floor);
+
 
     }
     private void SpawnPlayerInRoom(int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
@@ -147,6 +147,12 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         Instantiate( obj, new Vector3(spawnTile.x + 0.5f, spawnTile.y + 0.5f, 0f), Quaternion.identity);
 
         Debug.Log("spawned");
+
+        if (obj.GetComponent<Stairs>())
+        {
+            Debug.Log("Object has Stairs script");
+            Dungeon.Grid[spawnTile.x, spawnTile.y].cellType = CellType.Stairs;
+        }
     }
 
 
