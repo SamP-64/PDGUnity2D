@@ -5448,6 +5448,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2607079676019455260, guid: 45010d36954edea4ca3f1fb8a74ce282, type: 3}
+      propertyPath: dg
+      value: 
+      objectReference: {fileID: 986286115}
+    - target: {fileID: 2607079676019455260, guid: 45010d36954edea4ca3f1fb8a74ce282, type: 3}
       propertyPath: MiniMap
       value: 
       objectReference: {fileID: 1124234163}
@@ -9725,8 +9729,8 @@ MonoBehaviour:
   randomWalkParameters: {fileID: 11400000, guid: e28a0690c508e6046a94de7b564e2218, type: 2}
   minRoomWidth: 7
   minRoomHeight: 7
-  dungeonWidth: 40
-  dungeonHeight: 40
+  dungeonWidth: 111
+  dungeonHeight: 111
   randomWalkRooms: 1
   roomOffset: 2
   player: {fileID: 2002937525}
@@ -9777,7 +9781,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 1816059602}
   minimapParent: {fileID: 860460607}
-  tileSize: 12
+  tileSize: 8
+  dg: {fileID: 986286115}
+  offset: {x: -850, y: -400}
 --- !u!4 &1124234164
 Transform:
   m_ObjectHideFlags: 0
@@ -9979,7 +9985,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -899.8, y: -364.2}
+  m_AnchoredPosition: {x: -892.00024, y: -452}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1816059604

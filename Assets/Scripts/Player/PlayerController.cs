@@ -6,9 +6,8 @@ public class PlayerController : MonoBehaviour
 
 
     public float moveSpeed;
-    public float speedX, speedY;
     Rigidbody2D rb;
-    public RoomFirstDG dungeonGenerator;
+    public RoomFirstDG dg;
 
     [SerializeField] MiniMap MiniMap;
 
@@ -41,7 +40,7 @@ public class PlayerController : MonoBehaviour
             Dungeon.Grid[lastCell.x, lastCell.y].cellType = CellType.Empty;
             lastCell = currentCell;
 
-            if (cellX >= 0 && cellX <= 40 && cellY >= 0 && cellY <= 40)
+            if (cellX >= 0 && cellX <= dg.dungeonWidth && cellY >= 0 && cellY <= dg.dungeonHeight )
             {
                 RevealAroundPlayer(cellX, cellY);
                 MiniMap.DrawMinimap();
@@ -60,8 +59,8 @@ public class PlayerController : MonoBehaviour
         if (startX < 0) startX = 0;
         if (startY < 0) startY = 0;
 
-        if (startX + 10 > 40) startX = 40 - 10;
-        if (startY + 10 > 40) startY = 40 - 10;
+        if (startX + 10 > dg.dungeonWidth) startX = dg.dungeonWidth - 10;
+        if (startY + 10 > dg.dungeonHeight) startY = dg.dungeonHeight - 10;
 
         for (int x = startX; x < startX + 10; x++)
         {
@@ -96,7 +95,7 @@ public class PlayerController : MonoBehaviour
         if (other.TryGetComponent(out Stairs stairs))
         {
             Debug.Log(other.name);
-            GameManager.Instance.NextFloor(dungeonGenerator);
+            GameManager.Instance.NextFloor(dg);
         }
     }
 }
