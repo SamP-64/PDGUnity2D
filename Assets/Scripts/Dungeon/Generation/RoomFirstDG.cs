@@ -59,12 +59,26 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
         List<Vector2Int> roomCenters = new List<Vector2Int>();
 
-        foreach (var room in roomsList)
+          foreach (var room in roomsList)
+          {
+
+        roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
+        //    coins.Add(new Vector2Int(Mathf.RoundToInt(room.center.x), Mathf.RoundToInt(room.center.y)));
+
+          }
+
+        foreach (Room room in rooms)
         {
-            roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
 
-            coins.Add(new Vector2Int(Mathf.RoundToInt(room.center.x), Mathf.RoundToInt(room.center.y)));
+        
 
+            if (room.cells.Count == 0)
+                continue;
+            Debug.Log("Room num " + room.num);
+            int index = Random.Range(0, room.cells.Count);
+            Cell randomCell = room.cells[index];
+
+            coins.Add(new Vector2Int(Mathf.RoundToInt(randomCell.x), Mathf.RoundToInt(randomCell.y)));
         }
 
         SpawnPlayerInRoom( 0 , roomsList, floor);
@@ -175,15 +189,23 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         return floor;
     }
 
+
+    public List<Room> rooms = new List<Room>();
+
     private HashSet<Vector2Int> CreateRoomsRandomly(List<BoundsInt> roomsList)
     {
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
+
+        rooms.Clear();
 
         for (int i = 0; i < roomsList.Count; i++)
         {
             var roomBounds = roomsList[i];
             var roomCenter = new Vector2Int(Mathf.RoundToInt(roomBounds.center.x), Mathf.RoundToInt(roomBounds.center.y));
             var roomFloor = RunRandomWalk(roomCenter, randomWalkParameters);
+
+            rooms.Add(new Room(i));
+            Debug.Log(i);
 
             foreach (var position in roomFloor)
             {
@@ -192,13 +214,18 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
                     position.y >= (roomBounds.yMin + roomOffset) &&
                     position.y <= (roomBounds.yMax - roomOffset))
                 {
+
+
+                    rooms[i].cells.Add(Dungeon.Grid[position.x, position.y]);
                     floor.Add(position);
                     Dungeon.Grid[position.x, position.y].roomNum = i + 1;
+
+
                     //if(Dungeon.Grid[position.x, position.y].roomNum == 2)
                     //{
                     //    Instantiate(stairs, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
                     //}
-                   
+
 
                 }
             }
@@ -254,21 +281,21 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             unconnectedRooms.Remove(bestUnconnectedRoom);
         }
 
-        foreach (var room in roomCenters)
+        foreach (var roomCenter in roomCenters)
         {
-            while (connections[room].Count < 2)
+            while (connections[roomCenter].Count < 2)
             {
-                Vector2Int closestRoom = FindClosestRoomNotConnected(room, roomCenters, connections[room]);
+                Vector2Int closestRoom = FindClosestRoomNotConnected(roomCenter, roomCenters, connections[roomCenter]);
 
-                if (closestRoom == room)
+                if (closestRoom == roomCenter)
                 {
                     break;
                 }
 
-                corridors.UnionWith(CreateCorridor(room, closestRoom));
+                corridors.UnionWith(CreateCorridor(roomCenter, closestRoom));
 
-                connections[room].Add(closestRoom);
-                connections[closestRoom].Add(room);
+                connections[roomCenter].Add(closestRoom);
+                connections[closestRoom].Add(roomCenter);
             }
         }
 

@@ -17,6 +17,8 @@ public static class Dungeon
             for (int y = 0; y < height; y++)
             {
                 Grid[x, y] = new Cell();
+                Grid[x, y].x = x;
+                Grid[x, y].y = y;
             }
         }
     }
@@ -34,7 +36,17 @@ public static class Dungeon
         }
     }
 
+    public static void ResetRoomNums(int width, int height)  // Optional helper to initialize the grid
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
 
+                Grid[x, y].roomNum = 0;
+            }
+        }
+    }
 }
 
 public enum CellType
