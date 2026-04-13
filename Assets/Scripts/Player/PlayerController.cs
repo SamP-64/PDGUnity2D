@@ -37,16 +37,24 @@ public class PlayerController : MonoBehaviour
         {
 
 
-            Dungeon.Grid[lastCell.x, lastCell.y].cellType = CellType.Empty;
+            Dungeon.Grid[lastCell.x, lastCell.y].cellType = CellType.Floor;
             lastCell = currentCell;
 
             if (cellX >= 0 && cellX <= dg.dungeonWidth && cellY >= 0 && cellY <= dg.dungeonHeight )
             {
                 RevealAroundPlayer(cellX, cellY);
                 MiniMap.DrawMinimap();
+
+
+                Enemy[] enemies = FindObjectsOfType<Enemy>();
+
+                foreach (Enemy enemy in enemies )
+                {
+                    enemy.RandomMove();
+                }
             }
 
-           
+
         }
     }
 

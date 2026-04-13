@@ -17,7 +17,7 @@ public class TileMapDisplayer : MonoBehaviour
        wallDiagonalCornerDownRight, wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft;
 
     [SerializeField] private GameObject coin;
-
+    [SerializeField] private GameObject enemy;
 
     public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions)
     {
@@ -35,11 +35,27 @@ public class TileMapDisplayer : MonoBehaviour
        
     }
 
+    public void PaintEnemyTiles(IEnumerable<Vector2Int> floorPositions)
+    {
+        foreach (var position in floorPositions)
+        {
+            Vector3 pos = new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
+            GameObject enemyRef = Instantiate(enemy, pos, Quaternion.identity);
+            Enemy enemyScript = enemyRef.GetComponent<Enemy>();
+            enemyScript.SetStartPosition(position);
+            // Dungeon.Grid[position.x, position.y].cellType = CellType.Coin;
+        }
+
+    }
+
     private void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Tilemap floorTileMap, TileBase floorTile)
     {
         foreach (var position in floorPositions) 
         {
             PaintSingleTile(floorTileMap, floorTile, position);
+
+
+            Debug.Log(position.x + " " + position.y);
             Dungeon.Grid[position.x, position.y].cellType = CellType.Floor;
           //  Instantiate(coin, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
         } 

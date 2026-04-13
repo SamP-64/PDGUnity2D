@@ -46,7 +46,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
         HashSet<Vector2Int> coins = new HashSet<Vector2Int>();
-
+        HashSet<Vector2Int> enemyLocations = new HashSet<Vector2Int>();
 
         if (randomWalkRooms)
         {
@@ -81,6 +81,20 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             coins.Add(new Vector2Int(Mathf.RoundToInt(randomCell.x), Mathf.RoundToInt(randomCell.y)));
         }
 
+        foreach (Room room in rooms)
+        {
+
+
+
+            if (room.cells.Count == 0)
+                continue;
+            Debug.Log("Room num " + room.num);
+            int index = Random.Range(0, room.cells.Count);
+            Cell randomCell = room.cells[index];
+
+            enemyLocations.Add(new Vector2Int(Mathf.RoundToInt(randomCell.x), Mathf.RoundToInt(randomCell.y)));
+        }
+
         SpawnPlayerInRoom( 0 , roomsList, floor);
 
 
@@ -91,6 +105,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         WallGenerator.CreateWalls(floor, tileMapDisplayer);
 
         tileMapDisplayer.PaintCoinTiles(coins);
+        tileMapDisplayer.PaintEnemyTiles(enemyLocations);
 
         SpawnInRoom(stairs, roomsList.Count - 1, roomsList, floor);
 

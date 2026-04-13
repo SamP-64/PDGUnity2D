@@ -12,9 +12,14 @@ public class CorridorFirstDG : RandomWalkDungeonGenerator
     [SerializeField]
     [Range(0.1f,1f)]
     private float roomPercent = 0.8f;
-  
+
+   // [SerializeField]
+   // public int dungeonWidth = 20, dungeonHeight = 20;
+
     protected override void RunProceduralGeneration()
     {
+
+      //  Dungeon.Initialize(dungeonHeight, dungeonWidth);
         CorridorFirstGeneration();
     }
 
@@ -98,7 +103,7 @@ public class CorridorFirstDG : RandomWalkDungeonGenerator
             var corridor = DungeonGeneration.CreateCorridor(currentPosition, corridorLength);
             currentPosition = corridor[corridor.Count  - 1];
             roomPositions.Add(currentPosition);
-            floorPositions.UnionWith (corridor);
+            floorPositions.UnionWith(corridor);
            
         }
     }

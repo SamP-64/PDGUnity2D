@@ -12,9 +12,13 @@ public class RandomWalkDungeonGenerator : AbstractDungeonGenerator
     [SerializeField]
     protected RandomWalkData randomWalkParameters;
 
+    [SerializeField]
+    public int width = 20, height = 20;
 
     protected override void RunProceduralGeneration()
     {
+        Dungeon.Initialize(height, width);
+
         HashSet<Vector2Int> floorPositions = RunRandomWalk(startPosition, randomWalkParameters);
         tileMapDisplayer.ClearTileMap();
         tileMapDisplayer.PaintFloorTiles(floorPositions);
