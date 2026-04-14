@@ -56,5 +56,6 @@ public enum CellType
     Wall,
     Stairs,
     Coin,
-    player
+    player,
+    Enemy
 }

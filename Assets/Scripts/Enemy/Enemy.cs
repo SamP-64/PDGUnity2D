@@ -24,8 +24,7 @@ public class Enemy : MonoBehaviour
             Vector2Int.right
         };
 
-        // shuffle directions
-        for (int i = 0; i < dirs.Length; i++)
+        for (int i = 0; i < dirs.Length; i++) // shuffle directions
         {
             Vector2Int temp = dirs[i];
             int r = Random.Range(i, dirs.Length);
@@ -33,17 +32,21 @@ public class Enemy : MonoBehaviour
             dirs[r] = temp;
         }
 
-        // try each direction until valid move found
-        foreach (var dir in dirs)
+        foreach (var dir in dirs)   // try each direction until valid move found
         {
             Vector2Int newPos = gridPos + dir;
 
             if (IsValidMove(newPos))
             {
+                Dungeon.Grid[newPos.x, newPos.y].cellType = CellType.Enemy;
+                Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;
                 gridPos = newPos;
                 transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
+         
+               
                 return;
             }
+
         }
 
         // fallback: stand still ONLY if completely blocked

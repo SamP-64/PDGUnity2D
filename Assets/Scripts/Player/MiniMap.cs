@@ -60,7 +60,7 @@ public class MiniMap : MonoBehaviour
                 switch (cell.cellType)
                 {
                     case CellType.Wall:
-                        minimapTiles[x, y].color = Color.red;
+                        minimapTiles[x, y].color = Color.gray;
                         break;
                     case CellType.player:
                         minimapTiles[x, y].color = Color.white;
@@ -73,6 +73,9 @@ public class MiniMap : MonoBehaviour
                         break;
                     case CellType.Empty:
                         minimapTiles[x, y].color = Color.clear;
+                        break;
+                    case CellType.Enemy:
+                        minimapTiles[x, y].color = Color.red;
                         break;
                     default:
                         minimapTiles[x, y].color = Color.clear;

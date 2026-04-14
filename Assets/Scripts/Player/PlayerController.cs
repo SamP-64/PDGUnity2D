@@ -42,9 +42,7 @@ public class PlayerController : MonoBehaviour
 
             if (cellX >= 0 && cellX <= dg.dungeonWidth && cellY >= 0 && cellY <= dg.dungeonHeight )
             {
-                RevealAroundPlayer(cellX, cellY);
-                MiniMap.DrawMinimap();
-
+            
 
                 Enemy[] enemies = FindObjectsOfType<Enemy>();
 
@@ -52,6 +50,10 @@ public class PlayerController : MonoBehaviour
                 {
                     enemy.RandomMove();
                 }
+
+                RevealAroundPlayer(cellX, cellY);
+                MiniMap.DrawMinimap();
+
             }
 
 
