@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class PlayerController : MonoBehaviour
 {
@@ -45,13 +44,8 @@ public class PlayerController : MonoBehaviour
 
             if (cellX >= 0 && cellX <= dg.dungeonWidth && cellY >= 0 && cellY <= dg.dungeonHeight )
             {
-            
-                Enemy[] enemies = FindObjectsOfType<Enemy>();
 
-                foreach (Enemy enemy in enemies)
-                {
-                    enemy.RandomMove();
-                }
+                TurnManager.NextTurn();
 
                 RevealAroundPlayer(cellX, cellY);
                 MiniMap.DrawMinimap();
@@ -91,7 +85,6 @@ public class PlayerController : MonoBehaviour
 
         if (other.TryGetComponent(out Coin coin))
         {
-           
 
             Vector2 pos = other.transform.position;
             int x = Mathf.FloorToInt(pos.x);
