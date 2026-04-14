@@ -7,4 +7,5 @@ public class Cell
     public float roomNum;
     public int x;
     public int y;
+    public GameObject itemOnCell;
 }

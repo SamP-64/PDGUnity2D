@@ -39,8 +39,10 @@ public class Enemy : MonoBehaviour
             if (IsValidMove(newPos))
             {
                 Dungeon.Grid[newPos.x, newPos.y].cellType = CellType.Enemy;
+                Dungeon.Grid[newPos.x, newPos.y].itemOnCell = this.gameObject;
                 Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;
-                gridPos = newPos;
+                Dungeon.Grid[gridPos.x, gridPos.y].itemOnCell = null;
+              gridPos = newPos;
                 transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
          
                

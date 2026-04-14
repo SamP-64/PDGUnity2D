@@ -4,16 +4,20 @@ using static UnityEditor.PlayerSettings;
 public class PlayerController : MonoBehaviour
 {
 
-
     public float moveSpeed;
     Rigidbody2D rb;
     public RoomFirstDG dg;
+    public int cellX;
+    public int cellY;
 
+    public PlayerStats Stats;
     [SerializeField] MiniMap MiniMap;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        Stats = GetComponent<PlayerStats>();
+        Stats.IntializeStats(20, 5, 5);
     }
 
     // Update is called once per frame
@@ -27,8 +31,8 @@ public class PlayerController : MonoBehaviour
         Vector2 newPosition = rb.position + movement;
         rb.MovePosition(newPosition);
 
-        int cellX = Mathf.FloorToInt(newPosition.x);
-        int cellY = Mathf.FloorToInt(newPosition.y);
+        cellX = Mathf.FloorToInt(newPosition.x);
+        cellY = Mathf.FloorToInt(newPosition.y);
 
         Dungeon.Grid[cellX, cellY].cellType = CellType.player;
         Vector2Int currentCell = new Vector2Int(cellX, cellY);
@@ -36,17 +40,15 @@ public class PlayerController : MonoBehaviour
         if (currentCell != lastCell)
         {
 
-
             Dungeon.Grid[lastCell.x, lastCell.y].cellType = CellType.Floor;
             lastCell = currentCell;
 
             if (cellX >= 0 && cellX <= dg.dungeonWidth && cellY >= 0 && cellY <= dg.dungeonHeight )
             {
             
-
                 Enemy[] enemies = FindObjectsOfType<Enemy>();
 
-                foreach (Enemy enemy in enemies )
+                foreach (Enemy enemy in enemies)
                 {
                     enemy.RandomMove();
                 }
@@ -55,7 +57,6 @@ public class PlayerController : MonoBehaviour
                 MiniMap.DrawMinimap();
 
             }
-
 
         }
     }
