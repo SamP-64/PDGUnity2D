@@ -59,9 +59,8 @@ public class PlayerController : MonoBehaviour
         Vector2Int targetCell = currentCell + movement;
 
         // ✅ CHECK BEFORE MOVING
-        if (Dungeon.Grid[targetCell.x, targetCell.y].cellType != CellType.Floor)
+        if (Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Wall || Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Enemy)
         {
-            Dungeon.Grid[cellX, cellY].cellType = CellType.Floor;
             return;
         }
 
@@ -150,6 +149,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.L))
         {
             Destroy(Dungeon.Grid[cellX - 1, cellY].itemOnCell);
+            Dungeon.Grid[cellX - 1, cellY].cellType = CellType.Floor;
             Debug.Log("2");
             TurnManager.NextTurn();
         }
