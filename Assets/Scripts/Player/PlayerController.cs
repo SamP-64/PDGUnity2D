@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -24,17 +24,59 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
-        Vector2 movement = input * moveSpeed * Time.fixedDeltaTime;
 
-        Vector2 newPosition = rb.position + movement;
+        
+
+        Debug.Log(cellX + " " + cellY);
+        //Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+        //Vector2 movement = input * moveSpeed * Time.fixedDeltaTime;
+
+        //Vector2 newPosition = rb.position + movement;
+        //rb.MovePosition(newPosition);
+
+        //cellX = Mathf.FloorToInt(newPosition.x);
+        //cellY = Mathf.FloorToInt(newPosition.y);
+
+        //Dungeon.Grid[cellX, cellY].cellType = CellType.player;
+        //Vector2Int currentCell = new Vector2Int(cellX, cellY);
+
+        int x = 0;
+        int y = 0;
+
+        if (Input.GetKey(KeyCode.A)) x = -1;
+        else if (Input.GetKey(KeyCode.D)) x = 1;
+        else if (Input.GetKey(KeyCode.W)) y = 1;
+        else if (Input.GetKey(KeyCode.S)) y = -1;
+
+        cellX = Mathf.FloorToInt(gameObject.transform.position.x);
+        cellY = Mathf.FloorToInt(gameObject.transform.position.y);
+        Vector2Int movement = new Vector2Int(x, y);
+
+        // current grid position
+        Vector2Int currentCell = new Vector2Int(cellX, cellY);
+        Debug.Log(cellX + " " + cellY);
+        // target grid position
+        Vector2Int targetCell = currentCell + movement;
+
+        // ✅ CHECK BEFORE MOVING
+        if (Dungeon.Grid[targetCell.x, targetCell.y].cellType != CellType.Floor)
+        {
+            Dungeon.Grid[cellX, cellY].cellType = CellType.Floor;
+            return;
+        }
+
+        // now move
+        Vector2 newPosition = rb.position + (Vector2)movement;
         rb.MovePosition(newPosition);
 
-        cellX = Mathf.FloorToInt(newPosition.x);
-        cellY = Mathf.FloorToInt(newPosition.y);
+        // update grid
+        Dungeon.Grid[cellX, cellY].cellType = CellType.Floor;
+
+        cellX = targetCell.x;
+        cellY = targetCell.y;
 
         Dungeon.Grid[cellX, cellY].cellType = CellType.player;
-        Vector2Int currentCell = new Vector2Int(cellX, cellY);
+
 
         if (currentCell != lastCell)
         {
@@ -100,6 +142,16 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log(other.name);
             GameManager.Instance.NextFloor(dg);
+        }
+    }
+
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            Destroy(Dungeon.Grid[cellX - 1, cellY].itemOnCell);
+            Debug.Log("2");
+            TurnManager.NextTurn();
         }
     }
 }

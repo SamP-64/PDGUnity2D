@@ -23,10 +23,6 @@ public class PlayerStats : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            Destroy(Dungeon.Grid[pc.cellX - 1, pc.cellY].itemOnCell);
-            Debug.Log("2");
-        }
+
     }
 }

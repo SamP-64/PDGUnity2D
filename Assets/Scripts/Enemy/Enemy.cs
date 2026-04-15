@@ -4,6 +4,8 @@ public class Enemy : MonoBehaviour
 {
     public Vector2Int gridPos;
     PlayerController pc;
+    PlayerStats ps;
+ 
 
     public void SetPosition(Vector2Int pos)
     {
@@ -15,8 +17,20 @@ public class Enemy : MonoBehaviour
     {
         gridPos = pos;
         pc = FindObjectOfType<PlayerController>();
+        ps = FindObjectOfType<PlayerStats>();
     }
 
+    public bool IsNextToPlayer()
+    {
+        if(Mathf.Abs(pc.cellX - gridPos.x) + Mathf.Abs(pc.cellY - gridPos.y) == 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     int sightRange = 9;
     public void MoveTowardsPlayer()
     {
@@ -71,8 +85,15 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    bool IsValidMove(Vector2Int pos)
+    {
+        if (pos.x < 0 || pos.y < 0)
+            return false;
 
-    public void RandomMove()
+        return Dungeon.Grid[pos.x, pos.y].cellType == CellType.Floor;
+    }
+
+    void RandomMove()
     {
         Vector2Int[] dirs =
         {
@@ -112,11 +133,10 @@ public class Enemy : MonoBehaviour
         // fallback: stand still ONLY if completely blocked
     }
 
-    bool IsValidMove(Vector2Int pos)
-    {
-        if (pos.x < 0 || pos.y < 0 )
-            return false;
+  
 
-        return Dungeon.Grid[pos.x, pos.y].cellType == CellType.Floor;
+    public void Attack()
+    {
+        Debug.Log("Attacking");
     }
 }

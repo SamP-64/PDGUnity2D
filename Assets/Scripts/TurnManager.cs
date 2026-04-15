@@ -6,11 +6,22 @@ public static class TurnManager
     {
         Enemy[] enemies = Object.FindObjectsOfType<Enemy>();
 
+
         foreach (Enemy enemy in enemies)
         {
             // enemy.RandomMove();
 
-            enemy.MoveTowardsPlayer();
+            if(enemy.IsNextToPlayer())
+            {
+                enemy.Attack();
+            }
+            else
+            {
+                enemy.MoveTowardsPlayer();
+            }
+             
         }
     }
+
+
 }

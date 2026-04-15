@@ -47,6 +47,14 @@ public static class Dungeon
             }
         }
     }
+
+    public static bool IsValidMove(Vector2Int pos)
+    {
+        if (pos.x < 0 || pos.y < 0)
+            return false;
+
+        return Dungeon.Grid[pos.x, pos.y].cellType == CellType.Floor;
+    }
 }
 
 public enum CellType
