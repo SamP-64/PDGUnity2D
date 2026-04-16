@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         Stats = GetComponent<PlayerStats>();
-        Stats.IntializeStats(20, 5, 5);
+        Stats.IntializeStats(5, 20, 8, 8);
     }
 
     private Vector2Int lastCell = new Vector2Int(40, 40);
