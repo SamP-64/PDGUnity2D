@@ -42,7 +42,6 @@ public class Enemy : MonoBehaviour
             RandomMove();
             return; 
         }
-
         Vector2Int[] dirs =
         {
         Vector2Int.up,

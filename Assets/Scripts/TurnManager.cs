@@ -1,17 +1,28 @@
 using UnityEngine;
+using System.Collections;
 
-public static class TurnManager 
+public class TurnManager : MonoBehaviour   
 {
-    public static void NextTurn()
-    {
-        Enemy[] enemies = Object.FindObjectsOfType<Enemy>();
 
+    [SerializeField] public MiniMap MiniMap;
+    public static TurnManager Instance;
+    private void Awake()
+    {
+        Instance = this;
+
+    }
+
+    public IEnumerator NextTurn(float waitTime)
+    {
+
+        yield return new WaitForSeconds(waitTime); 
+
+
+        Enemy[] enemies = FindObjectsOfType<Enemy>();
 
         foreach (Enemy enemy in enemies)
         {
-            // enemy.RandomMove();
-
-            if(enemy.IsNextToPlayer())
+            if (enemy.IsNextToPlayer())
             {
                 enemy.Attack();
             }
@@ -19,8 +30,10 @@ public static class TurnManager
             {
                 enemy.MoveTowardsPlayer();
             }
-             
+
         }
+
+
     }
 
 
