@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
@@ -33,17 +34,9 @@ public class Enemy : MonoBehaviour
             return false;
         }
     }
-    int sightRange = 9;
-    public void MoveTowardsPlayer()
+
+    Vector2Int GetBestAdjacentToPlayer()
     {
-
-        int distToPlayer = Mathf.Abs(pc.cellX - gridPos.x) + Mathf.Abs(pc.cellY - gridPos.y);
-
-        if (distToPlayer > sightRange) // Only Follow if close enough
-        {
-            RandomMove();
-            return; 
-        }
         Vector2Int[] dirs =
         {
         Vector2Int.up,
@@ -52,39 +45,115 @@ public class Enemy : MonoBehaviour
         Vector2Int.right
     };
 
-        Vector2Int bestMove = gridPos;
-        int bestDistance = int.MaxValue;
+        Vector2Int playerPos = new Vector2Int(pc.cellX, pc.cellY);
 
         foreach (var dir in dirs)
         {
-            Vector2Int newPos = gridPos + dir;
+            Vector2Int test = playerPos + dir;
 
-            if (!IsValidMove(newPos))
-                continue;
-
-            int dist = Mathf.Abs(pc.cellX - newPos.x) +
-                       Mathf.Abs(pc.cellY - newPos.y);
-
-            if (dist < bestDistance)
-            {
-                bestDistance = dist;
-                bestMove = newPos;
-            }
+            if (IsValidMove(test))
+                return test;
         }
 
-        // If a better move was found → move
-        if (bestMove != gridPos)
-        {
-            Dungeon.Grid[bestMove.x, bestMove.y].cellType = CellType.Enemy;
-            Dungeon.Grid[bestMove.x, bestMove.y].itemOnCell = this.gameObject;
-
-            Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;
-            Dungeon.Grid[gridPos.x, gridPos.y].itemOnCell = null;
-
-            gridPos = bestMove;
-            transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
-        }
+        return playerPos; // fallback
     }
+    public void MoveTowardsPlayer()
+    {
+        Vector2Int start = gridPos;
+        Vector2Int goal = new Vector2Int(pc.cellX, pc.cellY);
+
+        List<Vector2Int> path = Pathfinder.FindPath(start, goal);
+
+        if (path == null || path.Count < 2)
+        {
+            RandomMove();
+            return;
+        }
+
+        Debug.Log("moved");
+        MoveTo(path[1]);
+    }
+
+    void MoveTo(Vector2Int newPos)
+    {
+        if (newPos == gridPos)
+            return;
+
+        if (!IsValidMove(newPos))
+            return;
+
+        // block movement only if occupied by enemy
+        if (Dungeon.Grid[newPos.x, newPos.y].itemOnCell != null &&
+            Dungeon.Grid[newPos.x, newPos.y].itemOnCell != this.gameObject)
+        {
+            return;
+        }
+
+        // clear old tile
+        Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;
+        Dungeon.Grid[gridPos.x, gridPos.y].itemOnCell = null;
+
+        // set new tile
+        Dungeon.Grid[newPos.x, newPos.y].cellType = CellType.Enemy;
+        Dungeon.Grid[newPos.x, newPos.y].itemOnCell = this.gameObject;
+
+        // update position
+        gridPos = newPos;
+        transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
+
+    }
+    int sightRange = 9;
+    //public void MoveTowardsPlayer()
+    //{
+
+    //    int distToPlayer = Mathf.Abs(pc.cellX - gridPos.x) + Mathf.Abs(pc.cellY - gridPos.y);
+
+    //    if (distToPlayer > sightRange) // Only Follow if close enough
+    //    {
+    //        RandomMove();
+    //        return; 
+    //    }
+    //    Vector2Int[] dirs =
+    //    {
+    //    Vector2Int.up,
+    //    Vector2Int.down,
+    //    Vector2Int.left,
+    //    Vector2Int.right
+    //};
+
+    //    Vector2Int bestMove = gridPos;
+    //    int bestDistance = int.MaxValue;
+
+    //    foreach (var dir in dirs)
+    //    {
+    //        Vector2Int newPos = gridPos + dir;
+
+    //        if (!IsValidMove(newPos))
+    //            continue;
+
+    //        int dist = Mathf.Abs(pc.cellX - newPos.x) +
+    //                   Mathf.Abs(pc.cellY - newPos.y);
+
+    //        if (dist < bestDistance)
+    //        {
+    //            bestDistance = dist;
+    //            bestMove = newPos;
+    //        }
+    //    }
+
+    //    // If a better move was found → move
+    //    if (bestMove != gridPos)
+    //    {
+    //        Dungeon.Grid[bestMove.x, bestMove.y].cellType = CellType.Enemy;
+    //        Dungeon.Grid[bestMove.x, bestMove.y].itemOnCell = this.gameObject;
+
+    //        Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;
+    //        Dungeon.Grid[gridPos.x, gridPos.y].itemOnCell = null;
+
+    //        gridPos = bestMove;
+    //        transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
+    //    }
+    //}
 
     bool IsValidMove(Vector2Int pos)
     {

@@ -25,10 +25,11 @@ public class TurnManager : MonoBehaviour
             if (enemy.IsNextToPlayer())
             {
                 enemy.Attack();
-                Debug.Log("Attackinglolololol");
+              
             }
             else
             {
+                Debug.Log("movetoplayere");
                 enemy.MoveTowardsPlayer();
             }
 
