@@ -6,6 +6,9 @@ public class TurnManager : MonoBehaviour
 
     [SerializeField] public MiniMap MiniMap;
     public static TurnManager Instance;
+
+    bool isProcessingTurn = false;
+
     private void Awake()
     {
         Instance = this;
@@ -14,6 +17,11 @@ public class TurnManager : MonoBehaviour
 
     public IEnumerator NextTurn(float waitTime)
     {
+        if (isProcessingTurn)
+            yield break;
+
+        isProcessingTurn = true;
+
 
         yield return new WaitForSeconds(waitTime); 
 
@@ -27,11 +35,11 @@ public class TurnManager : MonoBehaviour
                 enemy.Attack();
               
             }
-            //else if (enemy.GetDistanceFromPlayer() < enemy.sightRange)
-            //{
-            //    Debug.Log("movetoplayere");
-            //    enemy.MoveTowardsPlayer();
-            //}
+            else if (enemy.GetDistanceFromPlayer() < enemy.sightRange)
+            {
+                Debug.Log("movetoplayere");
+                enemy.MoveTowardsPlayer();
+            }
             else 
             {
                 Debug.Log("movetoCoin");
@@ -41,8 +49,11 @@ public class TurnManager : MonoBehaviour
 
         }
 
-
+        isProcessingTurn = false;
     }
 
-
+    public bool IsTurnRunning()
+    {
+        return isProcessingTurn;
+    }
 }

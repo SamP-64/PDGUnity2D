@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class EnemyStats : MonoBehaviour
 {
@@ -36,9 +37,20 @@ public class EnemyStats : MonoBehaviour
 
     void Die()
     {
-      textLog.AddMessage("Player Defeated Enemy!");
+      
         Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType = CellType.Floor;
+
+        if (enemy.collectedItem != null)
+        {
+            Debug.Log(enemy.collectedItem.name);
+            textLog.AddMessage("Player Defeated Enemy!");
+            Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType = enemy.collectedItem.GetComponent<Spawnable>().CellType;
+            enemy.collectedItem.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 0f);
+            enemy.collectedItem.gameObject.SetActive(true);
+        }
+
         Destroy(this.gameObject);
+        
     }
 
 }

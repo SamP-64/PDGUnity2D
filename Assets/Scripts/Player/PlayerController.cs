@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public MiniMap MiniMap;
     [SerializeField] TurnManager TurnManager;
 
+
     float turnDelay = 0.1f;
 
     void Start()
@@ -127,7 +128,7 @@ public class PlayerController : MonoBehaviour
 
         if (holding && holdTime > 0.3)
         {
-            turnDelay = 0.01f;
+            turnDelay = 0f;
             if (Input.GetKey(KeyCode.A)) inputDir = Vector2Int.left;
             else if (Input.GetKey(KeyCode.D)) inputDir = Vector2Int.right;
             else if (Input.GetKey(KeyCode.W)) inputDir = Vector2Int.up;
@@ -154,6 +155,10 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
+
+        if (TurnManager.Instance.IsTurnRunning())
+            return;
+
         if (inputDir == Vector2Int.zero)
             return;
 
@@ -188,31 +193,58 @@ public class PlayerController : MonoBehaviour
             return;
 
         // move
-        rb.MovePosition(rb.position + (Vector2)movement);
+        Vector3 worldPos = new Vector3(
+    targetCell.x + 0.5f,
+    targetCell.y + 0.5f,
+    0f);
 
-        
+        rb.MovePosition(worldPos);
+
 
         cellX = targetCell.x;
         cellY = targetCell.y;
 
 
-     
+
         // turn system
-        if (currentCell != lastCell)
+        //if (currentCell != lastCell)
+        //{
+        //    // 1. CLEAR OLD POSITION (ALWAYS FIRST)
+        //    Dungeon.Grid[currentCell.x, currentCell.y].cellType = CellType.Floor;
+
+        //    // 2. UPDATE POSITION (you already moved physically before this block)
+        //    lastCell = currentCell;
+
+        //    // 3. SET NEW POSITION
+        //    Dungeon.Grid[cellX, cellY].cellType = CellType.player;
+
+        //    StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
+
+        //    RevealAroundPlayer(cellX, cellY);
+        //    MiniMap.DrawMinimap();
+        //}
+
+        Vector2Int previousCell = lastCell;
+        Vector2Int newCell = targetCell;
+
+        if (previousCell != newCell)
         {
-            // 1. CLEAR OLD POSITION (ALWAYS FIRST)
-            Dungeon.Grid[currentCell.x, currentCell.y].cellType = CellType.Floor;
+            // clear OLD (this is the key fix)
+            Dungeon.Grid[previousCell.x, previousCell.y].cellType = CellType.Floor;
 
-            // 2. UPDATE POSITION (you already moved physically before this block)
-            lastCell = currentCell;
+            // set NEW
+            Dungeon.Grid[newCell.x, newCell.y].cellType = CellType.player;
 
-            // 3. SET NEW POSITION
-            Dungeon.Grid[cellX, cellY].cellType = CellType.player;
+            // update tracking
+            lastCell = newCell;
+            cellX = newCell.x;
+            cellY = newCell.y;
 
             StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
 
             RevealAroundPlayer(cellX, cellY);
             MiniMap.DrawMinimap();
         }
+
     }
 }

@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using static UnityEditor.Progress;
 
 public class Enemy : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class Enemy : MonoBehaviour
     PlayerStats ps;
     TextLog textLog;
     EnemyStats enemyStats;
+    public GameObject collectedItem;
+
     public void SetPosition(Vector2Int pos)
     {
         gridPos = pos;
@@ -116,8 +119,8 @@ public class Enemy : MonoBehaviour
         if (cell.itemOnCell != null && cell.itemOnCell.TryGetComponent<Coin>(out var coin))
         {
             Debug.Log("Destroy");
-
-            Destroy(cell.itemOnCell.gameObject);
+            collectedItem = cell.itemOnCell;
+            collectedItem.gameObject.SetActive(false);
         }
 
 
