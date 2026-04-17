@@ -5,8 +5,8 @@ public class Enemy : MonoBehaviour
     public Vector2Int gridPos;
     PlayerController pc;
     PlayerStats ps;
- 
-
+    TextLog textLog;
+    EnemyStats enemyStats;
     public void SetPosition(Vector2Int pos)
     {
         gridPos = pos;
@@ -15,9 +15,11 @@ public class Enemy : MonoBehaviour
 
     public void SetStartPosition(Vector2Int pos)
     {
+        enemyStats = GetComponent<EnemyStats>();
         gridPos = pos;
         pc = FindObjectOfType<PlayerController>();
         ps = FindObjectOfType<PlayerStats>();
+        textLog = FindObjectOfType<TextLog>();
     }
 
     public bool IsNextToPlayer()
@@ -136,6 +138,10 @@ public class Enemy : MonoBehaviour
 
     public void Attack()
     {
-        Debug.Log("Attacking");
+        Debug.Log("Attackinglol");
+        int damage = DamageCalculator.CalculateDamage(enemyStats.level, enemyStats.attack, 50, ps.level);
+        ps.ApplyDamage(damage);
+        enemyStats.currentHP = enemyStats.currentHP - damage;
+        textLog.AddMessage("Player took " + damage + " damage!");
     }
 }

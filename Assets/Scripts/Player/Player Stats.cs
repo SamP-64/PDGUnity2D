@@ -3,33 +3,36 @@ using TMPro;
 
 public class PlayerStats : MonoBehaviour
 {
-    int level;
-    int maxHP;
-    int currentHP;
-    int attack;
-    int defence;
+    public int level;
+    public int maxHP;
+    public int currentHP;
+    public int attack;
+    public int defence;
 
     PlayerController pc;
 
     [SerializeField] TMP_Text levelText;
     [SerializeField] TMP_Text hpText;
-    public void Awake()
-    {
-        pc = gameObject.GetComponent<PlayerController>();
-    }
+
     public void IntializeStats(int level, int hp, int atk, int def)
     {
+        this.level = level;
         this.maxHP = hp;
         this.currentHP = hp;
         this.attack = atk;
         this.defence = def;
 
+        UpdateText();  
+    }
+
+    private void UpdateText()
+    {
         levelText.text = "Lvl. " + level;
         hpText.text = "hp. " + currentHP + " / " + maxHP;
     }
-
-    public void Update()
+    public void ApplyDamage(int damage)
     {
-
+        currentHP = currentHP - damage;
+        UpdateText();
     }
 }

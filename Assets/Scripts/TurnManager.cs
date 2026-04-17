@@ -25,6 +25,7 @@ public class TurnManager : MonoBehaviour
             if (enemy.IsNextToPlayer())
             {
                 enemy.Attack();
+                Debug.Log("Attackinglolololol");
             }
             else
             {

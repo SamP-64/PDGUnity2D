@@ -54,9 +54,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // -------------------------
-    // PICKUP / STAIRS
-    // -------------------------
+   
+    [SerializeField] TextLog textLog;
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.TryGetComponent(out Coin coin))
@@ -67,6 +66,7 @@ public class PlayerController : MonoBehaviour
 
             Dungeon.Grid[x, y].cellType = CellType.Floor;
             Destroy(other.gameObject);
+            textLog.AddMessage("Player Collected " + " 5 " + " Gold!");
             return;
         }
 
@@ -76,9 +76,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // -------------------------
-    // ATTACK
-    // -------------------------
     void Attack(int x, int y)
     {
         if (x < 0 || x >= Dungeon.Grid.GetLength(0) ||
@@ -89,20 +86,24 @@ public class PlayerController : MonoBehaviour
 
         if (cell.itemOnCell != null)
         {
-            Destroy(cell.itemOnCell);
-            cell.cellType = CellType.Floor;
+            if(cell.itemOnCell.GetComponent <EnemyStats>() != null)
+            {
+                EnemyStats enemyStats = cell.itemOnCell.GetComponent<EnemyStats>();
+                int damage = DamageCalculator.CalculateDamage(Stats.level, Stats.attack, 50, enemyStats.defence);
+                textLog.AddMessage("Enemy took " + damage + " damage!");
+            }
 
-            StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
+          
         }
+
+        StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
     }
 
-    // -------------------------
-    // INPUT
-    // -------------------------
+    
     void Update()
     {
 
-        // HOLD tracking (FIXED)
+        // HOLD tracking 
         holding = Input.GetKey(KeyCode.A) ||
                   Input.GetKey(KeyCode.D) ||
                   Input.GetKey(KeyCode.W) ||
@@ -132,7 +133,12 @@ public class PlayerController : MonoBehaviour
             else if (Input.GetKey(KeyCode.W)) inputDir = Vector2Int.up;
             else if (Input.GetKey(KeyCode.S)) inputDir = Vector2Int.down;
         }
-        Debug.Log(turnDelay);
+
+        CheckAttack();
+    }
+
+    void CheckAttack()
+    {
         // attack
         if (Input.GetKeyDown(KeyCode.UpArrow))
             Attack(cellX, cellY + 1);
@@ -146,10 +152,6 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.RightArrow))
             Attack(cellX + 1, cellY);
     }
-
-    // -------------------------
-    // MOVEMENT
-    // -------------------------
     void FixedUpdate()
     {
         if (inputDir == Vector2Int.zero)
