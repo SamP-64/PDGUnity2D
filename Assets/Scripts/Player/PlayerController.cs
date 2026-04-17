@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour
             {
                 EnemyStats enemyStats = cell.itemOnCell.GetComponent<EnemyStats>();
                 int damage = DamageCalculator.CalculateDamage(Stats.level, Stats.attack, 50, enemyStats.defence);
-                textLog.AddMessage("Enemy took " + damage + " damage!");
+                enemyStats.ApplyDamage(damage);
             }
 
           

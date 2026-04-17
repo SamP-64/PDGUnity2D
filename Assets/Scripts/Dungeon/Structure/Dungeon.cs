@@ -4,10 +4,11 @@ public static class Dungeon
 {
     
     public static Cell[,] Grid; // access any tile through Dungeon.Grid[x, y]
+  
 
     public static void Initialize(int width, int height)  // Optional helper to initialize the grid
     {
-
+        
         width = width + 5;
         height = height + 5;
 

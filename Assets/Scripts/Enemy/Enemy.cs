@@ -144,4 +144,5 @@ public class Enemy : MonoBehaviour
         enemyStats.currentHP = enemyStats.currentHP - damage;
         textLog.AddMessage("Player took " + damage + " damage!");
     }
+
 }
