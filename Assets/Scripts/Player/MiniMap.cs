@@ -71,6 +71,9 @@ public class MiniMap : MonoBehaviour
                     case CellType.Stairs:
                         minimapTiles[x, y].color = Color.blue;
                         break;
+                    case CellType.potion:
+                        minimapTiles[x, y].color = Color.green;
+                        break;
                     case CellType.Empty:
                         minimapTiles[x, y].color = Color.clear;
                         break;

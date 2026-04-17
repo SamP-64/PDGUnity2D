@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.PlayerSettings;
 using Random = UnityEngine.Random;
 
 public class RoomFirstDG : RandomWalkDungeonGenerator
@@ -26,7 +27,13 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     [SerializeField]
     private GameObject stairs;
 
+    [SerializeField]
+    private GameObject potion;
 
+    [SerializeField]
+    private GameObject enemy;
+
+    #region Dungeon Generation
     protected override void RunProceduralGeneration()
     {
         
@@ -80,17 +87,17 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             coins.Add(new Vector2Int(Mathf.RoundToInt(randomCell.x), Mathf.RoundToInt(randomCell.y)));
         }
 
-        foreach (Room room in rooms)
-        {
+        //foreach (Room room in rooms)
+        //{
 
-            if (room.cells.Count == 0)
-                continue;
-            Debug.Log("Room num " + room.num);
-            int index = Random.Range(0, room.cells.Count);
-            Cell randomCell = room.cells[index];
+        //    if (room.cells.Count == 0)
+        //        continue;
+        //    Debug.Log("Room num " + room.num);
+        //    int index = Random.Range(0, room.cells.Count);
+        //    Cell randomCell = room.cells[index];
 
-            enemyLocations.Add(new Vector2Int(Mathf.RoundToInt(randomCell.x), Mathf.RoundToInt(randomCell.y)));
-        }
+        //    enemyLocations.Add(new Vector2Int(Mathf.RoundToInt(randomCell.x), Mathf.RoundToInt(randomCell.y)));
+        //}
 
         SpawnPlayerInRoom( 0 , roomsList, floor);
 
@@ -102,83 +109,12 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         WallGenerator.CreateWalls(floor, tileMapDisplayer);
 
         tileMapDisplayer.PaintCoinTiles(coins);
-        tileMapDisplayer.PaintEnemyTiles(enemyLocations);
+    //    tileMapDisplayer.PaintEnemyTiles(enemyLocations);
 
-        SpawnInRoom(stairs, roomsList.Count - 1, roomsList, floor);
+        SpawnStairs();
+        SpawnPotions();
+        SpawnEnemies();
 
-
-    }
-    private void SpawnPlayerInRoom(int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
-    {
-        BoundsInt firstRoom = roomsList[0]; // first room
-        List<Vector2Int> firstRoomFloors = new List<Vector2Int>();
-
-        foreach (var tile in floor)
-        {
-            // Check if the tile is within the BSP room bounds
-            if (tile.x >= firstRoom.xMin && tile.x < firstRoom.xMax &&
-                tile.y >= firstRoom.yMin && tile.y < firstRoom.yMax)
-            {
-                firstRoomFloors.Add(tile);
-            }
-        }
-
-        // Pick a random floor tile inside the room
-        Vector2Int spawnTile = firstRoomFloors[Random.Range(0, firstRoomFloors.Count)];
-
-        // Set the player's position
-        player.transform.position = new Vector3(spawnTile.x + 0.5f, spawnTile.y + 0.5f, 0f);
-        Debug.Log("spawned player");
-        Debug.Log(spawnTile.y);
-        Debug.Log(spawnTile.x );
-
-    }
-    private void SpawnInRoom(GameObject obj, int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
-    {
-
-
-        Debug.Log("!");
-
-        // Make sure the room exists
-        if (roomIndex < 0 || roomIndex >= roomsList.Count)
-        {
-            Debug.Log("Room index out of range!");
-            return;
-        }
-
-        BoundsInt room = roomsList[roomIndex];
-
-        // Find all actual floor tiles inside this room
-        List<Vector2Int> roomFloors = new List<Vector2Int>();
-        foreach (var tile in floor)
-        {
-            if (tile.x >= room.xMin && tile.x < room.xMax &&
-                tile.y >= room.yMin && tile.y < room.yMax)
-            {
-                roomFloors.Add(tile);
-            }
-        }
-
-        // Make sure there are valid floor tiles
-        if (roomFloors.Count == 0)
-        {
-            Debug.Log("No floor tiles in this room!");
-            return;
-        }
-
-        // Pick a random floor tile
-        Vector2Int spawnTile = roomFloors[Random.Range(0, roomFloors.Count)];
-
-        // Spawn the object at that position
-        Instantiate( obj, new Vector3(spawnTile.x + 0.5f, spawnTile.y + 0.5f, 0f), Quaternion.identity);
-
-        Debug.Log("spawned");
-
-        if (obj.GetComponent<Stairs>())
-        {
-            Debug.Log("Object has Stairs script");
-            Dungeon.Grid[spawnTile.x, spawnTile.y].cellType = CellType.Stairs;
-        }
     }
 
 
@@ -393,4 +329,110 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
         return closestPoint;
     }
+
+    private void SpawnPlayerInRoom(int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
+    {
+        BoundsInt firstRoom = roomsList[0]; // first room
+        List<Vector2Int> firstRoomFloors = new List<Vector2Int>();
+
+        foreach (var tile in floor)
+        {
+            // Check if the tile is within the BSP room bounds
+            if (tile.x >= firstRoom.xMin && tile.x < firstRoom.xMax &&
+                tile.y >= firstRoom.yMin && tile.y < firstRoom.yMax)
+            {
+                firstRoomFloors.Add(tile);
+            }
+        }
+
+        // Pick a random floor tile inside the room
+        Vector2Int spawnTile = firstRoomFloors[Random.Range(0, firstRoomFloors.Count)];
+
+        // Set the player's position
+        player.transform.position = new Vector3(spawnTile.x + 0.5f, spawnTile.y + 0.5f, 0f);
+        Debug.Log("spawned player");
+        Debug.Log(spawnTile.y);
+        Debug.Log(spawnTile.x);
+
+    }
+
+    #endregion
+
+
+    private void SpawnPotions()
+    {
+        for (int i = 0; i < rooms.Count; i++)
+        {
+           Cell cell = rooms[i].GetRandomFloorCell();
+           GameObject potionRef = Instantiate(potion, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+           Dungeon.Grid[cell.x, cell.y].cellType = CellType.potion;
+           Dungeon.Grid[cell.x, cell.y].itemOnCell = potionRef;
+        }
+    }
+    private void SpawnEnemies()
+    {
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            Cell cell = rooms[i].GetRandomFloorCell();
+            GameObject enemyRef = Instantiate(enemy, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+            Dungeon.Grid[cell.x, cell.y].cellType = CellType.Enemy;
+            Enemy enemyScript = enemyRef.GetComponent<Enemy>();
+            enemyScript.SetStartPosition(new Vector2Int (cell.x, cell.y));
+        }
+    }
+    private void SpawnStairs()
+    {
+        Cell cell = rooms[rooms.Count - 1].GetRandomFloorCell();
+        Instantiate(stairs, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+        Dungeon.Grid[cell.x, cell.y].cellType = CellType.Stairs;
+        
+    }
+  //  private void SpawnInRoom(GameObject obj, int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
+    //{
+
+
+    //    Debug.Log("!");
+
+    //    // Make sure the room exists
+    //    if (roomIndex < 0 || roomIndex >= roomsList.Count)
+    //    {
+    //        Debug.Log("Room index out of range!");
+    //        return;
+    //    }
+
+    //    BoundsInt room = roomsList[roomIndex];
+
+    //    // Find all actual floor tiles inside this room
+    //    List<Vector2Int> roomFloors = new List<Vector2Int>();
+    //    foreach (var tile in floor)
+    //    {
+    //        if (tile.x >= room.xMin && tile.x < room.xMax &&
+    //            tile.y >= room.yMin && tile.y < room.yMax &&
+    //            Dungeon.Grid[tile.x,tile.y].cellType == CellType.Floor)
+    //        {
+    //            roomFloors.Add(tile);
+    //        }
+    //    }
+
+    //    // Make sure there are valid floor tiles
+    //    if (roomFloors.Count == 0)
+    //    {
+    //        Debug.Log("No floor tiles in this room");
+    //        return;
+    //    }
+
+    //    // Pick a random floor tile
+    //    Vector2Int spawnTile = roomFloors[Random.Range(0, roomFloors.Count)];
+
+    //    // Spawn the object at that position
+    //    Instantiate(obj, new Vector3(spawnTile.x + 0.5f, spawnTile.y + 0.5f, 0f), Quaternion.identity);
+
+    //    Debug.Log("spawned");
+
+    //    if (obj.GetComponent<Stairs>())
+    //    {
+    //        Debug.Log("Object has Stairs script");
+    //        Dungeon.Grid[spawnTile.x, spawnTile.y].cellType = CellType.Stairs;
+    //    }
+    //}
 }

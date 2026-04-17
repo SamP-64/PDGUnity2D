@@ -72,5 +72,6 @@ public enum CellType
     Stairs,
     Coin,
     player,
-    Enemy
+    Enemy,
+    potion
 }
