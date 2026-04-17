@@ -27,11 +27,17 @@ public class TurnManager : MonoBehaviour
                 enemy.Attack();
               
             }
-            else
+            //else if (enemy.GetDistanceFromPlayer() < enemy.sightRange)
+            //{
+            //    Debug.Log("movetoplayere");
+            //    enemy.MoveTowardsPlayer();
+            //}
+            else 
             {
-                Debug.Log("movetoplayere");
-                enemy.MoveTowardsPlayer();
+                Debug.Log("movetoCoin");
+                enemy.MoveTowardsCoin();
             }
+
 
         }
 

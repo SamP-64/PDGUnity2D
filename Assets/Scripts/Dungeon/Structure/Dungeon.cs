@@ -54,8 +54,14 @@ public static class Dungeon
         if (pos.x < 0 || pos.y < 0)
             return false;
 
-        return Dungeon.Grid[pos.x, pos.y].cellType == CellType.Floor;
-    }
+        if (Dungeon.Grid[pos.x, pos.y].cellType == CellType.Floor || Dungeon.Grid[pos.x, pos.y].cellType == CellType.Coin)
+        {
+            return true;
+        }
+
+
+        return false;
+       }
 }
 
 public enum CellType

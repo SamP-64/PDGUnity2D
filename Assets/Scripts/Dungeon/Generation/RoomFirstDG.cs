@@ -83,8 +83,6 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         foreach (Room room in rooms)
         {
 
-
-
             if (room.cells.Count == 0)
                 continue;
             Debug.Log("Room num " + room.num);

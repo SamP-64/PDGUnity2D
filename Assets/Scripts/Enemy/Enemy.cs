@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Enemy : MonoBehaviour
 {
@@ -25,7 +27,7 @@ public class Enemy : MonoBehaviour
 
     public bool IsNextToPlayer()
     {
-        if(Mathf.Abs(pc.cellX - gridPos.x) + Mathf.Abs(pc.cellY - gridPos.y) == 1)
+        if (Mathf.Abs(pc.cellX - gridPos.x) + Mathf.Abs(pc.cellY - gridPos.y) == 1)
         {
             return true;
         }
@@ -51,7 +53,7 @@ public class Enemy : MonoBehaviour
         {
             Vector2Int test = playerPos + dir;
 
-            if (IsValidMove(test))
+            if (Dungeon.IsValidMove(test))
                 return test;
         }
 
@@ -73,21 +75,51 @@ public class Enemy : MonoBehaviour
         Debug.Log("moved");
         MoveTo(path[1]);
     }
+    public void MoveTowardsCoin()
+    {
+        Vector2Int start = gridPos;
+
+        List<Vector2Int> path = Pathfinder.FindPath(start, FindNearestCoin());
+
+        if (path == null || path.Count < 2)
+        {
+            RandomMove();
+            return;
+        }
+
+        Debug.Log("moved");
+        MoveTo(path[1]);
+    }
+
 
     void MoveTo(Vector2Int newPos)
     {
         if (newPos == gridPos)
             return;
 
-        if (!IsValidMove(newPos))
-            return;
-
-        // block movement only if occupied by enemy
-        if (Dungeon.Grid[newPos.x, newPos.y].itemOnCell != null &&
-            Dungeon.Grid[newPos.x, newPos.y].itemOnCell != this.gameObject)
+        if (!Dungeon.IsValidMove(newPos))
         {
             return;
         }
+         
+
+        // block movement only if occupied by enemy
+        if (Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.player || Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.Enemy )
+        {
+            return;
+        }
+
+
+
+        var cell = Dungeon.Grid[newPos.x, newPos.y];
+
+        if (cell.itemOnCell != null && cell.itemOnCell.TryGetComponent<Coin>(out var coin))
+        {
+            Debug.Log("Destroy");
+
+            Destroy(cell.itemOnCell.gameObject);
+        }
+
 
         // clear old tile
         Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;
@@ -102,7 +134,15 @@ public class Enemy : MonoBehaviour
         transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
 
     }
-    int sightRange = 9;
+
+   public  int GetDistanceFromPlayer()
+    {
+          int distToPlayer = Mathf.Abs(pc.cellX - gridPos.x) + Mathf.Abs(pc.cellY - gridPos.y);
+
+          return distToPlayer;
+    }
+
+    public int sightRange = 9;
     //public void MoveTowardsPlayer()
     //{
 
@@ -155,13 +195,7 @@ public class Enemy : MonoBehaviour
     //    }
     //}
 
-    bool IsValidMove(Vector2Int pos)
-    {
-        if (pos.x < 0 || pos.y < 0)
-            return false;
 
-        return Dungeon.Grid[pos.x, pos.y].cellType == CellType.Floor;
-    }
 
     void RandomMove()
     {
@@ -185,13 +219,13 @@ public class Enemy : MonoBehaviour
         {
             Vector2Int newPos = gridPos + dir;
 
-            if (IsValidMove(newPos))
+            if (Dungeon.IsValidMove(newPos))
             {
                 Dungeon.Grid[newPos.x, newPos.y].cellType = CellType.Enemy;
                 Dungeon.Grid[newPos.x, newPos.y].itemOnCell = this.gameObject;
                 Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;
                 Dungeon.Grid[gridPos.x, gridPos.y].itemOnCell = null;
-              gridPos = newPos;
+                gridPos = newPos;
                 transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
          
                
@@ -214,4 +248,68 @@ public class Enemy : MonoBehaviour
         textLog.AddMessage("Player took " + damage + " damage!");
     }
 
+
+    List<Vector2Int> FindCoinsNearby()
+    {
+        List<Vector2Int> coins = new List<Vector2Int>();
+
+        for (int x = gridPos.x - 10; x <= gridPos.x + 10; x++)
+        {
+            for (int y = gridPos.y - 10; y <= gridPos.y + 10; y++)
+            {
+                // bounds check
+                if (x < 0 || y < 0 ||
+                    x >= Dungeon.Grid.GetLength(0) ||
+                    y >= Dungeon.Grid.GetLength(1))
+                    continue;
+
+                var cell = Dungeon.Grid[x, y];
+
+                if (cell.itemOnCell != null &&
+                    cell.itemOnCell.GetComponent<Coin>() != null)
+                {
+                    coins.Add(new Vector2Int(x, y));
+                }
+            }
+        }
+
+        return coins;
+    }
+
+   public  Vector2Int FindNearestCoin()
+    {
+        Vector2Int start = gridPos;
+
+        int bestSteps = int.MaxValue;
+        Vector2Int bestCoin = new Vector2Int(0,0);
+
+
+        var coins = FindCoinsNearby();
+        foreach (var coin in coins)
+        {
+            var path = Pathfinder.FindPath(start, new Vector2Int(coin.x, coin.y));
+
+            if (path == null || path.Count < 2)
+            { 
+            continue;
+             }
+
+
+            int steps = path.Count - 1;
+
+            if (steps > 10)
+            {
+                continue;
+            }
+               
+
+            if (steps < bestSteps)
+            {
+                bestSteps = steps;
+                bestCoin = new Vector2Int(coin.x, coin.y);
+            }
+        }
+
+        return bestCoin;
+    }
 }

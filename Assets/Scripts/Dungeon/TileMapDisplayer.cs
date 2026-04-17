@@ -29,6 +29,8 @@ public class TileMapDisplayer : MonoBehaviour
         {
             Vector3 pos = new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
             GameObject coinRef = Instantiate(coin, pos, Quaternion.identity);
+            coinRef.GetComponent<Spawnable>().x = position.x;
+            coinRef.GetComponent<Spawnable>().y = position.y;
             Dungeon.Grid[position.x, position.y].cellType = CellType.Coin;
             Dungeon.Grid[position.x, position.y].itemOnCell = coinRef;
         }
@@ -55,7 +57,7 @@ public class TileMapDisplayer : MonoBehaviour
             PaintSingleTile(floorTileMap, floorTile, position);
 
 
-            Debug.Log(position.x + " " + position.y);
+           // Debug.Log(position.x + " " + position.y);
             Dungeon.Grid[position.x, position.y].cellType = CellType.Floor;
           //  Instantiate(coin, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
         } 
