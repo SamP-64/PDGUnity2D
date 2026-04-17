@@ -33,11 +33,14 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     [SerializeField]
     private GameObject enemy;
 
+    [SerializeField]
+    private GameObject coin;
+
     #region Dungeon Generation
     protected override void RunProceduralGeneration()
     {
-        
-        Dungeon.Initialize(dungeonHeight , dungeonWidth );
+
+        Dungeon.Initialize(dungeonHeight, dungeonWidth);
         tileMapDisplayer.ClearTileMap();
         CreateRooms();
     }
@@ -51,8 +54,6 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         );
 
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
-        HashSet<Vector2Int> coins = new HashSet<Vector2Int>();
-        HashSet<Vector2Int> enemyLocations = new HashSet<Vector2Int>();
 
         if (randomWalkRooms)
         {
@@ -65,55 +66,18 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
         List<Vector2Int> roomCenters = new List<Vector2Int>();
 
-          foreach (var room in roomsList)
-          {
-
-              roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
-              //    coins.Add(new Vector2Int(Mathf.RoundToInt(room.center.x), Mathf.RoundToInt(room.center.y)));
-
-          }
-
-        foreach (Room room in rooms)
+        foreach (var room in roomsList)
         {
-
-        
-
-            if (room.cells.Count == 0)
-                continue;
-            Debug.Log("Room num " + room.num);
-            int index = Random.Range(0, room.cells.Count);
-            Cell randomCell = room.cells[index];
-
-            coins.Add(new Vector2Int(Mathf.RoundToInt(randomCell.x), Mathf.RoundToInt(randomCell.y)));
+            roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
         }
-
-        //foreach (Room room in rooms)
-        //{
-
-        //    if (room.cells.Count == 0)
-        //        continue;
-        //    Debug.Log("Room num " + room.num);
-        //    int index = Random.Range(0, room.cells.Count);
-        //    Cell randomCell = room.cells[index];
-
-        //    enemyLocations.Add(new Vector2Int(Mathf.RoundToInt(randomCell.x), Mathf.RoundToInt(randomCell.y)));
-        //}
-
-        SpawnPlayerInRoom( 0 , roomsList, floor);
-
-
         HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
         floor.UnionWith(corridors);
 
         tileMapDisplayer.PaintFloorTiles(floor);
         WallGenerator.CreateWalls(floor, tileMapDisplayer);
 
-        tileMapDisplayer.PaintCoinTiles(coins);
-    //    tileMapDisplayer.PaintEnemyTiles(enemyLocations);
-
-        SpawnStairs();
-        SpawnPotions();
-        SpawnEnemies();
+        SpawnPlayerInRoom(0, roomsList, floor);
+        SpawnSpawnables();
 
     }
 
@@ -358,7 +322,14 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
     #endregion
 
-
+    #region Spawnables
+    private void SpawnSpawnables()
+    {
+        SpawnStairs();
+        SpawnPotions();
+        SpawnCoins();
+        SpawnEnemies();
+    }
     private void SpawnPotions()
     {
         for (int i = 0; i < rooms.Count; i++)
@@ -367,6 +338,18 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
            GameObject potionRef = Instantiate(potion, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
            Dungeon.Grid[cell.x, cell.y].cellType = CellType.potion;
            Dungeon.Grid[cell.x, cell.y].itemOnCell = potionRef;
+        }
+    }
+    private void SpawnCoins()
+    {
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            Cell cell = rooms[i].GetRandomFloorCell();
+            GameObject coinRef = Instantiate(coin, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+            coinRef.GetComponent<Spawnable>().x = cell.y;
+            coinRef.GetComponent<Spawnable>().y = cell.y;
+            Dungeon.Grid[cell.x, cell.y].cellType = CellType.Coin;
+            Dungeon.Grid[cell.x, cell.y].itemOnCell = coinRef;
         }
     }
     private void SpawnEnemies()
@@ -387,52 +370,5 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         Dungeon.Grid[cell.x, cell.y].cellType = CellType.Stairs;
         
     }
-  //  private void SpawnInRoom(GameObject obj, int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
-    //{
-
-
-    //    Debug.Log("!");
-
-    //    // Make sure the room exists
-    //    if (roomIndex < 0 || roomIndex >= roomsList.Count)
-    //    {
-    //        Debug.Log("Room index out of range!");
-    //        return;
-    //    }
-
-    //    BoundsInt room = roomsList[roomIndex];
-
-    //    // Find all actual floor tiles inside this room
-    //    List<Vector2Int> roomFloors = new List<Vector2Int>();
-    //    foreach (var tile in floor)
-    //    {
-    //        if (tile.x >= room.xMin && tile.x < room.xMax &&
-    //            tile.y >= room.yMin && tile.y < room.yMax &&
-    //            Dungeon.Grid[tile.x,tile.y].cellType == CellType.Floor)
-    //        {
-    //            roomFloors.Add(tile);
-    //        }
-    //    }
-
-    //    // Make sure there are valid floor tiles
-    //    if (roomFloors.Count == 0)
-    //    {
-    //        Debug.Log("No floor tiles in this room");
-    //        return;
-    //    }
-
-    //    // Pick a random floor tile
-    //    Vector2Int spawnTile = roomFloors[Random.Range(0, roomFloors.Count)];
-
-    //    // Spawn the object at that position
-    //    Instantiate(obj, new Vector3(spawnTile.x + 0.5f, spawnTile.y + 0.5f, 0f), Quaternion.identity);
-
-    //    Debug.Log("spawned");
-
-    //    if (obj.GetComponent<Stairs>())
-    //    {
-    //        Debug.Log("Object has Stairs script");
-    //        Dungeon.Grid[spawnTile.x, spawnTile.y].cellType = CellType.Stairs;
-    //    }
-    //}
+    #endregion
 }

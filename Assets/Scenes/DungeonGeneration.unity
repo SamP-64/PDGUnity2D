@@ -31629,6 +31629,7 @@ MonoBehaviour:
   stairs: {fileID: 2969656102082491341, guid: cc22f50c810dd0f44b30acd7c8215ba0, type: 3}
   potion: {fileID: 2969656102082491341, guid: d2da720ebb848494f9c09059e113f15e, type: 3}
   enemy: {fileID: 4096093482109489030, guid: 72970affd6d1cca4db67c559a4747522, type: 3}
+  coin: {fileID: 2969656102082491341, guid: 39f9f794c2cbce740ba8eddf6be2b6f7, type: 3}
 --- !u!4 &986286116
 Transform:
   m_ObjectHideFlags: 0

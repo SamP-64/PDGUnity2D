@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     public int cellX;
     public int cellY;
 
-    public PlayerStats Stats;
+    public PlayerStats playerStats;
     [SerializeField] public MiniMap MiniMap;
     [SerializeField] TurnManager TurnManager;
 
@@ -19,8 +19,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        Stats = GetComponent<PlayerStats>();
-        Stats.IntializeStats(5, 20, 8, 8);
+        playerStats = GetComponent<PlayerStats>();
+        playerStats.IntializeStats(5, 20, 8, 8);
     }
 
     private Vector2Int lastCell = new Vector2Int(40, 40);
@@ -32,9 +32,7 @@ public class PlayerController : MonoBehaviour
 
     public int score = 0;
 
-    // -------------------------
-    // REVEAL MAP
-    // -------------------------
+
     public void RevealAroundPlayer(int playerX, int playerY)
     {
         int startX = playerX - 5;
@@ -61,22 +59,31 @@ public class PlayerController : MonoBehaviour
     {
         if (other.TryGetComponent(out Coin coin))
         {
-            Vector2 pos = other.transform.position;
-            int x = Mathf.FloorToInt(pos.x);
-            int y = Mathf.FloorToInt(pos.y);
-
-            Dungeon.Grid[x, y].cellType = CellType.Floor;
-            Destroy(other.gameObject);
-            textLog.AddMessage("Player Collected " + " 5 " + " Gold!");
+            DestroyCollidedObject(other);
+            textLog.AddMessage("Player Collected " + "5" + " Gold!");
             return;
         }
-
-        if (other.TryGetComponent(out Stairs stairs))
+        else if (other.TryGetComponent(out Potion potion))
+        {
+            DestroyCollidedObject(other);
+            playerStats.RestoreHealth(potion.healthToRestore);
+            textLog.AddMessage("Player restored " + potion.healthToRestore + " HP!");
+        }
+        else if (other.TryGetComponent(out Stairs stairs))
         {
             GameManager.Instance.NextFloor(dg);
         }
     }
 
+    void DestroyCollidedObject(Collider2D other)
+    {
+        Vector2 pos = other.transform.position;
+        int x = Mathf.FloorToInt(pos.x);
+        int y = Mathf.FloorToInt(pos.y);
+
+        Dungeon.Grid[x, y].cellType = CellType.Floor;
+        Destroy(other.gameObject);
+    }
     void Attack(int x, int y)
     {
         if (x < 0 || x >= Dungeon.Grid.GetLength(0) ||
@@ -90,7 +97,7 @@ public class PlayerController : MonoBehaviour
             if(cell.itemOnCell.GetComponent <EnemyStats>() != null)
             {
                 EnemyStats enemyStats = cell.itemOnCell.GetComponent<EnemyStats>();
-                int damage = DamageCalculator.CalculateDamage(Stats.level, Stats.attack, 50, enemyStats.defence);
+                int damage = DamageCalculator.CalculateDamage(playerStats.level, playerStats.attack, 50, enemyStats.defence);
                 enemyStats.ApplyDamage(damage);
             }
 
@@ -175,10 +182,6 @@ public class PlayerController : MonoBehaviour
         {
             inputDir = Vector2Int.zero;
         }
-        else
-        {
-
-        }
         Debug.Log(inputDir);
 
             cellX = Mathf.FloorToInt(transform.position.x);
@@ -209,25 +212,6 @@ public class PlayerController : MonoBehaviour
         cellX = targetCell.x;
         cellY = targetCell.y;
 
-
-
-        // turn system
-        //if (currentCell != lastCell)
-        //{
-        //    // 1. CLEAR OLD POSITION (ALWAYS FIRST)
-        //    Dungeon.Grid[currentCell.x, currentCell.y].cellType = CellType.Floor;
-
-        //    // 2. UPDATE POSITION (you already moved physically before this block)
-        //    lastCell = currentCell;
-
-        //    // 3. SET NEW POSITION
-        //    Dungeon.Grid[cellX, cellY].cellType = CellType.player;
-
-        //    StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
-
-        //    RevealAroundPlayer(cellX, cellY);
-        //    MiniMap.DrawMinimap();
-        //}
 
         Vector2Int previousCell = lastCell;
         Vector2Int newCell = targetCell;
@@ -285,13 +269,13 @@ public class PlayerController : MonoBehaviour
                 cell.itemOnCell.TryGetComponent<EnemyStats>(out var enemy))
             {
                 int dmg = DamageCalculator.CalculateDamage(
-                    Stats.level, Stats.attack, 50, enemy.defence);
+                    playerStats.level, playerStats.attack, 50, enemy.defence);
 
                 enemy.ApplyDamage(dmg);
                 break;
             }
 
-            yield return new WaitForSeconds(0.07f); // 🔥 controls travel speed
+            yield return new WaitForSeconds(0.07f); // travel speed
         }
 
         TurnManager.Instance.EndTurn();

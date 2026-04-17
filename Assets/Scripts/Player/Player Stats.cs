@@ -35,4 +35,16 @@ public class PlayerStats : MonoBehaviour
         currentHP = currentHP - damage;
         UpdateText();
     }
+    public void RestoreHealth(int restoreValue)
+    {
+        currentHP = currentHP + restoreValue;
+
+        if (currentHP > maxHP)
+        {
+            currentHP = maxHP;
+        }
+
+        UpdateText();
+    }
+
 }

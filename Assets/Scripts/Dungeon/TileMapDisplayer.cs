@@ -23,32 +23,32 @@ public class TileMapDisplayer : MonoBehaviour
         PaintFloorTiles(floorPositions, floorTileMap, floorTile);
     }
 
-    public void PaintCoinTiles(IEnumerable<Vector2Int> floorPositions)
-    {
-        foreach (var position in floorPositions)
-        {
-            Vector3 pos = new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
-            GameObject coinRef = Instantiate(coin, pos, Quaternion.identity);
-            coinRef.GetComponent<Spawnable>().x = position.x;
-            coinRef.GetComponent<Spawnable>().y = position.y;
-            Dungeon.Grid[position.x, position.y].cellType = CellType.Coin;
-            Dungeon.Grid[position.x, position.y].itemOnCell = coinRef;
-        }
+    //public void PaintCoinTiles(IEnumerable<Vector2Int> floorPositions)
+    //{
+    //    foreach (var position in floorPositions)
+    //    {
+    //        Vector3 pos = new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
+    //        GameObject coinRef = Instantiate(coin, pos, Quaternion.identity);
+    //        coinRef.GetComponent<Spawnable>().x = position.x;
+    //        coinRef.GetComponent<Spawnable>().y = position.y;
+    //        Dungeon.Grid[position.x, position.y].cellType = CellType.Coin;
+    //        Dungeon.Grid[position.x, position.y].itemOnCell = coinRef;
+    //    }
        
-    }
+    //}
 
-    public void PaintEnemyTiles(IEnumerable<Vector2Int> floorPositions)
-    {
-        foreach (var position in floorPositions)
-        {
-            Vector3 pos = new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
-            GameObject enemyRef = Instantiate(enemy, pos, Quaternion.identity);
-            Enemy enemyScript = enemyRef.GetComponent<Enemy>();
-            enemyScript.SetStartPosition(position);
-            // Dungeon.Grid[position.x, position.y].cellType = CellType.Coin;
-        }
+    //public void PaintEnemyTiles(IEnumerable<Vector2Int> floorPositions)
+    //{
+    //    foreach (var position in floorPositions)
+    //    {
+    //        Vector3 pos = new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
+    //        GameObject enemyRef = Instantiate(enemy, pos, Quaternion.identity);
+    //        Enemy enemyScript = enemyRef.GetComponent<Enemy>();
+    //        enemyScript.SetStartPosition(position);
+    //        // Dungeon.Grid[position.x, position.y].cellType = CellType.Coin;
+    //    }
 
-    }
+    //}
 
     private void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Tilemap floorTileMap, TileBase floorTile)
     {
