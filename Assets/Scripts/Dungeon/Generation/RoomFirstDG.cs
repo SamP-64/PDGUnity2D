@@ -61,8 +61,8 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
           foreach (var room in roomsList)
           {
 
-        roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
-        //    coins.Add(new Vector2Int(Mathf.RoundToInt(room.center.x), Mathf.RoundToInt(room.center.y)));
+              roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
+              //    coins.Add(new Vector2Int(Mathf.RoundToInt(room.center.x), Mathf.RoundToInt(room.center.y)));
 
           }
 

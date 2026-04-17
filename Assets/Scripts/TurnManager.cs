@@ -46,7 +46,6 @@ public class TurnManager : MonoBehaviour
                 enemy.MoveTowardsCoin();
             }
 
-
         }
 
         isProcessingTurn = false;
@@ -55,5 +54,15 @@ public class TurnManager : MonoBehaviour
     public bool IsTurnRunning()
     {
         return isProcessingTurn;
+    }
+
+    public void StartTurn()
+    {
+        isProcessingTurn = true;
+    }
+
+    public void EndTurn()
+    {
+        isProcessingTurn = false;
     }
 }

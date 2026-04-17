@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using System.Collections;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed;
@@ -152,6 +152,11 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
             Attack(cellX + 1, cellY);
+
+        if (Input.GetKeyDown(KeyCode.I)) RangedAttack(Vector2Int.up);
+        if (Input.GetKeyDown(KeyCode.K)) RangedAttack(Vector2Int.down);
+        if (Input.GetKeyDown(KeyCode.J)) RangedAttack(Vector2Int.left);
+        if (Input.GetKeyDown(KeyCode.L)) RangedAttack(Vector2Int.right);
     }
     void FixedUpdate()
     {
@@ -246,5 +251,71 @@ public class PlayerController : MonoBehaviour
             MiniMap.DrawMinimap();
         }
 
+    }
+
+    [SerializeField] GameObject rangedHitFX;
+
+    void RangedAttack(Vector2Int dir)
+    {
+        StartCoroutine(RangedAttackRoutine(dir));
+        TurnManager.Instance.StartTurn();
+    }
+    IEnumerator RangedAttackRoutine(Vector2Int dir)
+    {
+        Vector2Int pos = new Vector2Int(cellX, cellY);
+
+        for (int i = 1; i <= 10; i++)
+        {
+            pos += dir;
+
+            // bounds
+            if (pos.x < 0 || pos.y < 0 ||
+                pos.x >= Dungeon.Grid.GetLength(0) ||
+                pos.y >= Dungeon.Grid.GetLength(1))
+                break;
+
+            SpawnFX(pos, dir); // instant visual per step
+
+            var cell = Dungeon.Grid[pos.x, pos.y];
+
+            if (cell.cellType == CellType.Wall)
+                break;
+
+            if (cell.itemOnCell != null &&
+                cell.itemOnCell.TryGetComponent<EnemyStats>(out var enemy))
+            {
+                int dmg = DamageCalculator.CalculateDamage(
+                    Stats.level, Stats.attack, 50, enemy.defence);
+
+                enemy.ApplyDamage(dmg);
+                break;
+            }
+
+            yield return new WaitForSeconds(0.07f); // 🔥 controls travel speed
+        }
+
+        TurnManager.Instance.EndTurn();
+        StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
+    }
+
+    void SpawnFX(Vector2Int cell, Vector2Int dir)
+    {
+
+        
+        Vector3 pos = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
+
+        GameObject arrow = Instantiate(rangedHitFX, pos, Quaternion.identity);
+        arrow.transform.rotation = Quaternion.Euler(0, 0, GetAngle(dir));
+        Destroy(arrow, 0.1f);
+    }
+
+    float GetAngle(Vector2Int dir)
+    {
+        if (dir == Vector2Int.up) return 90f;
+        if (dir == Vector2Int.down) return -90f;
+        if (dir == Vector2Int.left) return 180f;
+        if (dir == Vector2Int.right) return 0f;
+
+        return 0f;
     }
 }

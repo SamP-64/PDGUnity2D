@@ -16813,6 +16813,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1541976505}
     - target: {fileID: 2607079676019455260, guid: 45010d36954edea4ca3f1fb8a74ce282, type: 3}
+      propertyPath: rangedHitFX
+      value: 
+      objectReference: {fileID: 2969656102082491341, guid: 1a98608372331cc40ba404cb5e7195f4, type: 3}
+    - target: {fileID: 2607079676019455260, guid: 45010d36954edea4ca3f1fb8a74ce282, type: 3}
       propertyPath: dungeonGenerator
       value: 
       objectReference: {fileID: 986286115}
@@ -31875,7 +31879,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3432b9a824fea3f44ba89113fb74fe68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MiniMap: {fileID: 1124234163}
+  MiniMap: {fileID: 0}
 --- !u!1 &1545250307
 GameObject:
   m_ObjectHideFlags: 0
