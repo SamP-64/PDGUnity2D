@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public MiniMap MiniMap;
     [SerializeField] TurnManager TurnManager;
 
+    float turnDelay = 0.1f;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -90,7 +92,7 @@ public class PlayerController : MonoBehaviour
             Destroy(cell.itemOnCell);
             cell.cellType = CellType.Floor;
 
-            StartCoroutine(TurnManager.Instance.NextTurn(0.1f));
+            StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
         }
     }
 
@@ -115,6 +117,7 @@ public class PlayerController : MonoBehaviour
         MiniMap.DrawMinimap();
         if (inputDir == Vector2Int.zero)
         {
+            turnDelay = 0.1f;
             if (Input.GetKeyDown(KeyCode.A)) inputDir = Vector2Int.left;
             else if (Input.GetKeyDown(KeyCode.D)) inputDir = Vector2Int.right;
             else if (Input.GetKeyDown(KeyCode.W)) inputDir = Vector2Int.up;
@@ -123,12 +126,13 @@ public class PlayerController : MonoBehaviour
 
         if (holding && holdTime > 0.3)
         {
+            turnDelay = 0.01f;
             if (Input.GetKey(KeyCode.A)) inputDir = Vector2Int.left;
             else if (Input.GetKey(KeyCode.D)) inputDir = Vector2Int.right;
             else if (Input.GetKey(KeyCode.W)) inputDir = Vector2Int.up;
             else if (Input.GetKey(KeyCode.S)) inputDir = Vector2Int.down;
         }
-
+        Debug.Log(turnDelay);
         // attack
         if (Input.GetKeyDown(KeyCode.UpArrow))
             Attack(cellX, cellY + 1);
@@ -203,7 +207,7 @@ public class PlayerController : MonoBehaviour
             // 3. SET NEW POSITION
             Dungeon.Grid[cellX, cellY].cellType = CellType.player;
 
-            StartCoroutine(TurnManager.Instance.NextTurn(0.1f));
+            StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
 
             RevealAroundPlayer(cellX, cellY);
             MiniMap.DrawMinimap();
