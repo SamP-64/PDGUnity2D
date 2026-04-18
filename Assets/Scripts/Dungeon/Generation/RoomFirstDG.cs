@@ -336,7 +336,9 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         {
            Cell cell = rooms[i].GetRandomFloorCell();
            GameObject potionRef = Instantiate(potion, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
-           Dungeon.Grid[cell.x, cell.y].cellType = CellType.potion;
+           potionRef.GetComponent<Spawnable>().x = cell.y;
+           potionRef.GetComponent<Spawnable>().y = cell.y;
+           Dungeon.Grid[cell.x, cell.y].cellType = CellType.Potion;
            Dungeon.Grid[cell.x, cell.y].itemOnCell = potionRef;
         }
     }

@@ -35,46 +35,6 @@ public class PlayerController : MonoBehaviour
         CheckAttack();
     }
 
-    void CheckHoldingKey()
-    {
-        // HOLD tracking 
-        holding = Input.GetKey(KeyCode.A) ||
-                  Input.GetKey(KeyCode.D) ||
-                  Input.GetKey(KeyCode.W) ||
-                  Input.GetKey(KeyCode.S);
-
-        if (holding)
-        {
-            holdTime += Time.deltaTime;
-        }
-        else
-        {
-            holdTime = 0f;
-        }
-    }
-
-    void SetInputDirection()
-    {
-        if (inputDir == Vector2Int.zero)
-        {
-            turnDelay = 0.1f;
-            if (Input.GetKeyDown(KeyCode.A)) inputDir = Vector2Int.left;
-            else if (Input.GetKeyDown(KeyCode.D)) inputDir = Vector2Int.right;
-            else if (Input.GetKeyDown(KeyCode.W)) inputDir = Vector2Int.up;
-            else if (Input.GetKeyDown(KeyCode.S)) inputDir = Vector2Int.down;
-        }
-
-        if (holding && holdTime > 0.3)
-        {
-            turnDelay = 0f;
-            if (Input.GetKey(KeyCode.A)) inputDir = Vector2Int.left;
-            else if (Input.GetKey(KeyCode.D)) inputDir = Vector2Int.right;
-            else if (Input.GetKey(KeyCode.W)) inputDir = Vector2Int.up;
-            else if (Input.GetKey(KeyCode.S)) inputDir = Vector2Int.down;
-        }
-
-    }
-
     private Vector2Int lastCell = new Vector2Int(40, 40);
     void FixedUpdate()
     {
@@ -108,16 +68,12 @@ public class PlayerController : MonoBehaviour
             Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Enemy)
             return;
 
-        
         Vector3 worldPos = new Vector3( targetCell.x + 0.5f, targetCell.y + 0.5f, 0f); // move
         transform.position = worldPos;
         // rb.MovePosition(worldPos);
 
-
         cellX = targetCell.x;
         cellY = targetCell.y;
-
-
 
         Vector2Int previousCell = lastCell;
         Vector2Int newCell = targetCell;
@@ -126,7 +82,7 @@ public class PlayerController : MonoBehaviour
         {
            
             Dungeon.Grid[previousCell.x, previousCell.y].cellType = CellType.Floor;
-            Dungeon.Grid[newCell.x, newCell.y].cellType = CellType.player;
+            Dungeon.Grid[newCell.x, newCell.y].cellType = CellType.Player;
 
             lastCell = newCell;
             cellX = newCell.x;
@@ -140,6 +96,46 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    #region Input
+    void CheckHoldingKey()
+    {
+        // HOLD tracking 
+        holding = Input.GetKey(KeyCode.A) ||
+                  Input.GetKey(KeyCode.D) ||
+                  Input.GetKey(KeyCode.W) ||
+                  Input.GetKey(KeyCode.S);
+
+        if (holding)
+        {
+            holdTime += Time.deltaTime;
+        }
+        else
+        {
+            holdTime = 0f;
+        }
+    }
+    void SetInputDirection()
+    {
+        if (inputDir == Vector2Int.zero)
+        {
+            turnDelay = 0.1f;
+            if (Input.GetKeyDown(KeyCode.A)) inputDir = Vector2Int.left;
+            else if (Input.GetKeyDown(KeyCode.D)) inputDir = Vector2Int.right;
+            else if (Input.GetKeyDown(KeyCode.W)) inputDir = Vector2Int.up;
+            else if (Input.GetKeyDown(KeyCode.S)) inputDir = Vector2Int.down;
+        }
+
+        if (holding && holdTime > 0.3)
+        {
+            turnDelay = 0f;
+            if (Input.GetKey(KeyCode.A)) inputDir = Vector2Int.left;
+            else if (Input.GetKey(KeyCode.D)) inputDir = Vector2Int.right;
+            else if (Input.GetKey(KeyCode.W)) inputDir = Vector2Int.up;
+            else if (Input.GetKey(KeyCode.S)) inputDir = Vector2Int.down;
+        }
+
+    }
+    #endregion 
     #region Collectables
 
     void OnTriggerEnter2D(Collider2D other)

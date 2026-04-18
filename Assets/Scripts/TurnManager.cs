@@ -12,19 +12,15 @@ public class TurnManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-
     }
 
     public IEnumerator NextTurn(float waitTime)
     {
-        if (isProcessingTurn)
-            yield break;
+        if (isProcessingTurn) { yield break; }
 
         isProcessingTurn = true;
 
-
         yield return new WaitForSeconds(waitTime); 
-
 
         Enemy[] enemies = FindObjectsOfType<Enemy>();
 
@@ -33,17 +29,14 @@ public class TurnManager : MonoBehaviour
             if (enemy.IsNextToPlayer())
             {
                 enemy.Attack();
-              
             }
             else if (enemy.GetDistanceFromPlayer() < enemy.sightRange)
             {
-                Debug.Log("movetoplayere");
                 enemy.MoveTowardsPlayer();
             }
             else 
             {
-                Debug.Log("movetoCoin");
-                enemy.MoveTowardsCoin();
+                enemy.MoveTowardsItem();
             }
 
         }

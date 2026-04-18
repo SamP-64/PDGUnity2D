@@ -62,7 +62,7 @@ public class MiniMap : MonoBehaviour
                     case CellType.Wall:
                         minimapTiles[x, y].color = Color.gray;
                         break;
-                    case CellType.player:
+                    case CellType.Player:
                         minimapTiles[x, y].color = Color.white;
                         break;
                     case CellType.Coin:
@@ -71,7 +71,7 @@ public class MiniMap : MonoBehaviour
                     case CellType.Stairs:
                         minimapTiles[x, y].color = Color.blue;
                         break;
-                    case CellType.potion:
+                    case CellType.Potion:
                         minimapTiles[x, y].color = Color.green;
                         break;
                     case CellType.Empty:

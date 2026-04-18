@@ -1,6 +1,5 @@
 using UnityEngine;
 using static UnityEditor.Progress;
-
 public class EnemyStats : MonoBehaviour
 {
     public int level;
@@ -20,11 +19,13 @@ public class EnemyStats : MonoBehaviour
         this.defence = def;
   
     }
+
     private void Start()
     {
         textLog = FindObjectOfType<TextLog>();
         enemy = gameObject.GetComponent<Enemy>();
     }
+
     public void ApplyDamage(int damage)
     {
         currentHP = currentHP - damage;
@@ -37,7 +38,6 @@ public class EnemyStats : MonoBehaviour
 
     void Die()
     {
-      
         Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType = CellType.Floor;
 
         if (enemy.collectedItem != null)

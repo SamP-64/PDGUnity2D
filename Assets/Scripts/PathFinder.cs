@@ -125,7 +125,8 @@ public static class Pathfinder
         {
             case CellType.Floor:
             case CellType.Coin:
-            case CellType.player:
+            case CellType.Potion:
+            case CellType.Player:
             case CellType.Enemy:
                 return true;
         }

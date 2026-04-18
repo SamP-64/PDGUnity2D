@@ -25,7 +25,9 @@ public class Room
         }
 
         if (floorCells.Count == 0)
+        {
             return null;
+        }
 
         return floorCells[Random.Range(0, floorCells.Count)];
     }

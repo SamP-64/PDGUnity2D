@@ -5,15 +5,14 @@ using UnityEngine.Tilemaps;
 
 public class TileMapDisplayer : MonoBehaviour
 {
-  [SerializeField] private Tilemap floorTileMap, wallTileMap;
-
+    [SerializeField] private Tilemap floorTileMap, wallTileMap;
     [SerializeField] private TileBase floorTile;
     [SerializeField] private TileBase WallTile;
 
     [SerializeField]
     private TileBase wallTop, wallSideRight, wallSideLeft, wallBottom, wallFull,
-       wallInnerCornerDownLeft, wallInnerCornerDownRight,
-       wallDiagonalCornerDownRight, wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft;
+    wallInnerCornerDownLeft, wallInnerCornerDownRight, wallDiagonalCornerDownRight, 
+    wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft;
 
     [SerializeField] private GameObject coin;
     [SerializeField] private GameObject enemy;
@@ -23,43 +22,12 @@ public class TileMapDisplayer : MonoBehaviour
         PaintFloorTiles(floorPositions, floorTileMap, floorTile);
     }
 
-    //public void PaintCoinTiles(IEnumerable<Vector2Int> floorPositions)
-    //{
-    //    foreach (var position in floorPositions)
-    //    {
-    //        Vector3 pos = new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
-    //        GameObject coinRef = Instantiate(coin, pos, Quaternion.identity);
-    //        coinRef.GetComponent<Spawnable>().x = position.x;
-    //        coinRef.GetComponent<Spawnable>().y = position.y;
-    //        Dungeon.Grid[position.x, position.y].cellType = CellType.Coin;
-    //        Dungeon.Grid[position.x, position.y].itemOnCell = coinRef;
-    //    }
-       
-    //}
-
-    //public void PaintEnemyTiles(IEnumerable<Vector2Int> floorPositions)
-    //{
-    //    foreach (var position in floorPositions)
-    //    {
-    //        Vector3 pos = new Vector3(position.x + 0.5f, position.y + 0.5f, 0f);
-    //        GameObject enemyRef = Instantiate(enemy, pos, Quaternion.identity);
-    //        Enemy enemyScript = enemyRef.GetComponent<Enemy>();
-    //        enemyScript.SetStartPosition(position);
-    //        // Dungeon.Grid[position.x, position.y].cellType = CellType.Coin;
-    //    }
-
-    //}
-
     private void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Tilemap floorTileMap, TileBase floorTile)
     {
         foreach (var position in floorPositions) 
         {
             PaintSingleTile(floorTileMap, floorTile, position);
-
-
-           // Debug.Log(position.x + " " + position.y);
             Dungeon.Grid[position.x, position.y].cellType = CellType.Floor;
-          //  Instantiate(coin, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
         } 
     }
 
@@ -87,7 +55,7 @@ public class TileMapDisplayer : MonoBehaviour
         int valueToInt = Convert.ToInt32(neighboursValue, 2); // convert the binary value to int
         TileBase tile = null;
 
-        if(WallTypeFinder.wallTop.Contains(valueToInt ))
+        if (WallTypeFinder.wallTop.Contains(valueToInt ))
         {
             tile = wallTop;
         }
@@ -108,10 +76,11 @@ public class TileMapDisplayer : MonoBehaviour
             tile = wallFull;
         }
 
-        if (tile!=null)
-
-        PaintSingleTile(wallTileMap, tile , position);
-        Dungeon.Grid[position.x, position.y].cellType = CellType.Wall;
+        if (tile != null)
+        {
+            PaintSingleTile(wallTileMap, tile, position);
+            Dungeon.Grid[position.x, position.y].cellType = CellType.Wall;
+        }
 
     }
 
@@ -154,8 +123,9 @@ public class TileMapDisplayer : MonoBehaviour
         }
 
         if (tile != null)
+        {
             PaintSingleTile(wallTileMap, tile, position);
-        Dungeon.Grid[position.x, position.y].cellType = CellType.Wall;
-
+            Dungeon.Grid[position.x, position.y].cellType = CellType.Wall;
+        }
     }
 }
