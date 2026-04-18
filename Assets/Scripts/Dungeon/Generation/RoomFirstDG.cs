@@ -76,6 +76,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         tileMapDisplayer.PaintFloorTiles(floor);
         WallGenerator.CreateWalls(floor, tileMapDisplayer);
 
+
         SpawnPlayerInRoom(0, roomsList, floor);
         SpawnSpawnables();
 
@@ -323,8 +324,11 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     #endregion
 
     #region Spawnables
+    
+    public int monsterRoom;
     private void SpawnSpawnables()
     {
+        monsterRoom = Random.Range(0, rooms.Count);
         SpawnStairs();
         SpawnPotions();
         SpawnCoins();
@@ -371,6 +375,19 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         Instantiate(stairs, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
         Dungeon.Grid[cell.x, cell.y].cellType = CellType.Stairs;
         
+    }
+    public void SpawnMonsterHouse()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            Cell cell = rooms[monsterRoom - 1].GetRandomFloorCell();
+            GameObject enemyRef = Instantiate(enemy, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+            Dungeon.Grid[cell.x, cell.y].cellType = CellType.Enemy;
+            Enemy enemyScript = enemyRef.GetComponent<Enemy>();
+            enemyScript.SetStartPosition(new Vector2Int(cell.x, cell.y));
+        }
+
+        monsterRoom = -1;  // cannot be spawned until next floor;
     }
     #endregion
 }

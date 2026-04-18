@@ -34,11 +34,10 @@ public class TurnManager : MonoBehaviour
             {
                 enemy.MoveTowardsPlayer();
             }
-            else 
+            else if (enemy.collectedItem == null)
             {
                 enemy.MoveTowardsItem();
             }
-
         }
 
         isProcessingTurn = false;

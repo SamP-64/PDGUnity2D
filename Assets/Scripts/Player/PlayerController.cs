@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     float holdTime;
     public int score = 0;
     Vector2Int inputDir = Vector2Int.zero;
+   [SerializeField] private int currentRoomNum;
 
     void Start()
     {
@@ -88,6 +89,14 @@ public class PlayerController : MonoBehaviour
             cellX = newCell.x;
             cellY = newCell.y;
 
+            currentRoomNum = Dungeon.Grid[newCell.x, newCell.y].roomNum;
+
+          if (  Dungeon.Grid[newCell.x, newCell.y].roomNum == dg.monsterRoom)
+            {
+                textLog.AddMessage("You Found a Monster House!");
+                dg.SpawnMonsterHouse();
+            }
+            
             StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
 
             Dungeon.RevealAroundPlayer(cellX, cellY);
