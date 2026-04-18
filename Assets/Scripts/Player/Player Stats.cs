@@ -30,16 +30,16 @@ public class PlayerStats : MonoBehaviour
         levelText.text = "Lvl. " + level;
         hpText.text = "hp. " + currentHP + " / " + maxHP;
     }
-    public void ApplyDamage(int damage)
+    public void ApplyDamage(int damage) // Method to decrease player health
     {
         currentHP = currentHP - damage;
         UpdateText();
     }
-    public void RestoreHealth(int restoreValue)
+    public void RestoreHealth(int restoreValue) // Method to increase player health
     {
         currentHP = currentHP + restoreValue;
 
-        if (currentHP > maxHP)
+        if (currentHP > maxHP) // stop hp going over max
         {
             currentHP = maxHP;
         }

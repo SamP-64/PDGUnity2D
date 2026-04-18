@@ -24,6 +24,25 @@ public static class Dungeon
         }
     }
 
+    public static void RevealAroundPlayer(int playerX, int playerY)
+    {
+        int startX = playerX - 5;
+        int startY = playerY - 5;
+
+        if (startX < 0) startX = 0;
+        if (startY < 0) startY = 0;
+
+        if (startX + 10 > Grid.GetLength(0)) startX = Grid.GetLength(0) - 10;
+        if (startY + 10 > Grid.GetLength(1)) startY = Grid.GetLength(1) - 10;
+
+        for (int x = startX; x < startX + 10; x++)
+        {
+            for (int y = startY; y < startY + 10; y++)
+            {
+                Grid[x, y].traversed = true;
+            }
+        }
+    }
     public static void ResetGrid(int width, int height)  // Optional helper to initialize the grid
     {
         for (int x = 0; x < width; x++)

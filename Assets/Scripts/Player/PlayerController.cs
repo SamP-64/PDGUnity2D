@@ -2,19 +2,23 @@
 using System.Collections;
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed;
+
+    [SerializeField] public MiniMap MiniMap;
+    [SerializeField] TurnManager TurnManager;
+    [SerializeField] TextLog textLog;
+    public RoomFirstDG dg;
+    public PlayerStats playerStats;
     Rigidbody2D rb;
 
-    public RoomFirstDG dg;
+    public float moveSpeed;
     public int cellX;
     public int cellY;
 
-    public PlayerStats playerStats;
-    [SerializeField] public MiniMap MiniMap;
-    [SerializeField] TurnManager TurnManager;
-
-
     float turnDelay = 0.1f;
+    bool holding = false;
+    float holdTime;
+    public int score = 0;
+    Vector2Int inputDir = Vector2Int.zero;
 
     void Start()
     {
@@ -23,38 +27,121 @@ public class PlayerController : MonoBehaviour
         playerStats.IntializeStats(5, 20, 8, 8);
     }
 
-    private Vector2Int lastCell = new Vector2Int(40, 40);
-
-    Vector2Int inputDir = Vector2Int.zero;
-
-    bool holding = false;
-    float holdTime;
-
-    public int score = 0;
-
-
-    public void RevealAroundPlayer(int playerX, int playerY)
+    void Update()
     {
-        int startX = playerX - 5;
-        int startY = playerY - 5;
+        CheckHoldingKey();
+        MiniMap.DrawMinimap();
+        SetInputDirection();
+        CheckAttack();
+    }
 
-        if (startX < 0) startX = 0;
-        if (startY < 0) startY = 0;
+    void CheckHoldingKey()
+    {
+        // HOLD tracking 
+        holding = Input.GetKey(KeyCode.A) ||
+                  Input.GetKey(KeyCode.D) ||
+                  Input.GetKey(KeyCode.W) ||
+                  Input.GetKey(KeyCode.S);
 
-        if (startX + 10 > dg.dungeonWidth) startX = dg.dungeonWidth - 10;
-        if (startY + 10 > dg.dungeonHeight) startY = dg.dungeonHeight - 10;
-
-        for (int x = startX; x < startX + 10; x++)
+        if (holding)
         {
-            for (int y = startY; y < startY + 10; y++)
-            {
-                Dungeon.Grid[x, y].traversed = true;
-            }
+            holdTime += Time.deltaTime;
+        }
+        else
+        {
+            holdTime = 0f;
         }
     }
 
-   
-    [SerializeField] TextLog textLog;
+    void SetInputDirection()
+    {
+        if (inputDir == Vector2Int.zero)
+        {
+            turnDelay = 0.1f;
+            if (Input.GetKeyDown(KeyCode.A)) inputDir = Vector2Int.left;
+            else if (Input.GetKeyDown(KeyCode.D)) inputDir = Vector2Int.right;
+            else if (Input.GetKeyDown(KeyCode.W)) inputDir = Vector2Int.up;
+            else if (Input.GetKeyDown(KeyCode.S)) inputDir = Vector2Int.down;
+        }
+
+        if (holding && holdTime > 0.3)
+        {
+            turnDelay = 0f;
+            if (Input.GetKey(KeyCode.A)) inputDir = Vector2Int.left;
+            else if (Input.GetKey(KeyCode.D)) inputDir = Vector2Int.right;
+            else if (Input.GetKey(KeyCode.W)) inputDir = Vector2Int.up;
+            else if (Input.GetKey(KeyCode.S)) inputDir = Vector2Int.down;
+        }
+
+    }
+
+    private Vector2Int lastCell = new Vector2Int(40, 40);
+    void FixedUpdate()
+    {
+
+        if (TurnManager.Instance.IsTurnRunning())
+            return;
+
+        if (inputDir == Vector2Int.zero)
+            return;
+
+        Vector2Int movement = inputDir;
+
+        if (holdTime < 1f) 
+        {
+            inputDir = Vector2Int.zero;
+        }
+
+        cellX = Mathf.FloorToInt(transform.position.x);
+        cellY = Mathf.FloorToInt(transform.position.y);
+
+        Vector2Int currentCell = new Vector2Int(cellX, cellY);
+        Vector2Int targetCell = currentCell + movement;
+
+        // bounds check
+        if (targetCell.x < 0 || targetCell.x >= Dungeon.Grid.GetLength(0) ||
+            targetCell.y < 0 || targetCell.y >= Dungeon.Grid.GetLength(1))
+            return;
+
+        // collision check
+        if (Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Wall ||
+            Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Enemy)
+            return;
+
+        
+        Vector3 worldPos = new Vector3( targetCell.x + 0.5f, targetCell.y + 0.5f, 0f); // move
+        transform.position = worldPos;
+        // rb.MovePosition(worldPos);
+
+
+        cellX = targetCell.x;
+        cellY = targetCell.y;
+
+
+
+        Vector2Int previousCell = lastCell;
+        Vector2Int newCell = targetCell;
+
+        if (previousCell != newCell)
+        {
+           
+            Dungeon.Grid[previousCell.x, previousCell.y].cellType = CellType.Floor;
+            Dungeon.Grid[newCell.x, newCell.y].cellType = CellType.player;
+
+            lastCell = newCell;
+            cellX = newCell.x;
+            cellY = newCell.y;
+
+            StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
+
+            Dungeon.RevealAroundPlayer(cellX, cellY);
+            MiniMap.DrawMinimap();
+        }
+
+    }
+
+    #region Collectables
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.TryGetComponent(out Coin coin))
@@ -84,67 +171,9 @@ public class PlayerController : MonoBehaviour
         Dungeon.Grid[x, y].cellType = CellType.Floor;
         Destroy(other.gameObject);
     }
-    void Attack(int x, int y)
-    {
-        if (x < 0 || x >= Dungeon.Grid.GetLength(0) ||
-            y < 0 || y >= Dungeon.Grid.GetLength(1))
-            return;
 
-        var cell = Dungeon.Grid[x, y];
-
-        if (cell.itemOnCell != null)
-        {
-            if(cell.itemOnCell.GetComponent <EnemyStats>() != null)
-            {
-                EnemyStats enemyStats = cell.itemOnCell.GetComponent<EnemyStats>();
-                int damage = DamageCalculator.CalculateDamage(playerStats.level, playerStats.attack, 50, enemyStats.defence);
-                enemyStats.ApplyDamage(damage);
-            }
-
-          
-        }
-
-        StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
-    }
-
-    
-    void Update()
-    {
-
-        // HOLD tracking 
-        holding = Input.GetKey(KeyCode.A) ||
-                  Input.GetKey(KeyCode.D) ||
-                  Input.GetKey(KeyCode.W) ||
-                  Input.GetKey(KeyCode.S);
-
-        if (holding)
-            holdTime += Time.deltaTime;
-        else
-            holdTime = 0f;
-
-        // step input
-        MiniMap.DrawMinimap();
-        if (inputDir == Vector2Int.zero)
-        {
-            turnDelay = 0.1f;
-            if (Input.GetKeyDown(KeyCode.A)) inputDir = Vector2Int.left;
-            else if (Input.GetKeyDown(KeyCode.D)) inputDir = Vector2Int.right;
-            else if (Input.GetKeyDown(KeyCode.W)) inputDir = Vector2Int.up;
-            else if (Input.GetKeyDown(KeyCode.S)) inputDir = Vector2Int.down;
-        }
-
-        if (holding && holdTime > 0.3)
-        {
-            turnDelay = 0f;
-            if (Input.GetKey(KeyCode.A)) inputDir = Vector2Int.left;
-            else if (Input.GetKey(KeyCode.D)) inputDir = Vector2Int.right;
-            else if (Input.GetKey(KeyCode.W)) inputDir = Vector2Int.up;
-            else if (Input.GetKey(KeyCode.S)) inputDir = Vector2Int.down;
-        }
-
-        CheckAttack();
-    }
-
+    #endregion 
+    #region Attack
     void CheckAttack()
     {
         // attack
@@ -165,77 +194,29 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.J)) RangedAttack(Vector2Int.left);
         if (Input.GetKeyDown(KeyCode.L)) RangedAttack(Vector2Int.right);
     }
-    void FixedUpdate()
+
+    void Attack(int x, int y)
     {
-
-        if (TurnManager.Instance.IsTurnRunning())
+        if (x < 0 || x >= Dungeon.Grid.GetLength(0) ||
+            y < 0 || y >= Dungeon.Grid.GetLength(1))
             return;
 
-        if (inputDir == Vector2Int.zero)
-            return;
+        var cell = Dungeon.Grid[x, y];
 
-        Vector2Int movement = inputDir;
-
-        // IMPORTANT RULE:
-        // before 1 second hold = single step only
-        if (holdTime < 1f)
+        if (cell.itemOnCell != null)
         {
-            inputDir = Vector2Int.zero;
-        }
-        Debug.Log(inputDir);
-
-            cellX = Mathf.FloorToInt(transform.position.x);
-        cellY = Mathf.FloorToInt(transform.position.y);
-
-        Vector2Int currentCell = new Vector2Int(cellX, cellY);
-        Vector2Int targetCell = currentCell + movement;
-
-        // bounds check
-        if (targetCell.x < 0 || targetCell.x >= Dungeon.Grid.GetLength(0) ||
-            targetCell.y < 0 || targetCell.y >= Dungeon.Grid.GetLength(1))
-            return;
-
-        // collision check
-        if (Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Wall ||
-            Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Enemy)
-            return;
-
-        // move
-        Vector3 worldPos = new Vector3(
-    targetCell.x + 0.5f,
-    targetCell.y + 0.5f,
-    0f);
-
-        rb.MovePosition(worldPos);
-
-
-        cellX = targetCell.x;
-        cellY = targetCell.y;
-
-
-        Vector2Int previousCell = lastCell;
-        Vector2Int newCell = targetCell;
-
-        if (previousCell != newCell)
-        {
-            // clear OLD (this is the key fix)
-            Dungeon.Grid[previousCell.x, previousCell.y].cellType = CellType.Floor;
-
-            // set NEW
-            Dungeon.Grid[newCell.x, newCell.y].cellType = CellType.player;
-
-            // update tracking
-            lastCell = newCell;
-            cellX = newCell.x;
-            cellY = newCell.y;
-
-            StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
-
-            RevealAroundPlayer(cellX, cellY);
-            MiniMap.DrawMinimap();
+            if (cell.itemOnCell.GetComponent<EnemyStats>() != null)
+            {
+                EnemyStats enemyStats = cell.itemOnCell.GetComponent<EnemyStats>();
+                int damage = DamageCalculator.CalculateDamage(playerStats.level, playerStats.attack, 50, enemyStats.defence);
+                enemyStats.ApplyDamage(damage);
+            }
         }
 
+        StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
     }
+    #endregion
+    #region Range Attack
 
     [SerializeField] GameObject rangedHitFX;
 
@@ -252,24 +233,21 @@ public class PlayerController : MonoBehaviour
         {
             pos += dir;
 
-            // bounds
             if (pos.x < 0 || pos.y < 0 ||
                 pos.x >= Dungeon.Grid.GetLength(0) ||
                 pos.y >= Dungeon.Grid.GetLength(1))
-                break;
+                break; // break if out of bounds
 
-            SpawnFX(pos, dir); // instant visual per step
+            SpawnFX(pos, dir); // spawn arrow
 
             var cell = Dungeon.Grid[pos.x, pos.y];
 
             if (cell.cellType == CellType.Wall)
                 break;
 
-            if (cell.itemOnCell != null &&
-                cell.itemOnCell.TryGetComponent<EnemyStats>(out var enemy))
+            if (cell.itemOnCell != null && cell.itemOnCell.TryGetComponent<EnemyStats>(out var enemy))
             {
-                int dmg = DamageCalculator.CalculateDamage(
-                    playerStats.level, playerStats.attack, 50, enemy.defence);
+                int dmg = DamageCalculator.CalculateDamage(playerStats.level, playerStats.attack, 50, enemy.defence);
 
                 enemy.ApplyDamage(dmg);
                 break;
@@ -284,8 +262,6 @@ public class PlayerController : MonoBehaviour
 
     void SpawnFX(Vector2Int cell, Vector2Int dir)
     {
-
-        
         Vector3 pos = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
 
         GameObject arrow = Instantiate(rangedHitFX, pos, Quaternion.identity);
@@ -302,4 +278,6 @@ public class PlayerController : MonoBehaviour
 
         return 0f;
     }
+
+    #endregion
 }
