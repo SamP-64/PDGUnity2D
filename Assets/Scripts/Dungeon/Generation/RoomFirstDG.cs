@@ -275,30 +275,6 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         return corridor;
     }
 
-    private void SpawnPlayerInRoom(int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
-    {
-        BoundsInt firstRoom = roomsList[0]; // first room
-        List<Vector2Int> firstRoomFloors = new List<Vector2Int>();
-
-        foreach (var tile in floor)
-        {
-            // Check if the tile is within the BSP room bounds
-            if (tile.x >= firstRoom.xMin && tile.x < firstRoom.xMax &&
-                tile.y >= firstRoom.yMin && tile.y < firstRoom.yMax)
-            {
-                firstRoomFloors.Add(tile);
-            }
-        }
-
-        // Pick a random floor tile inside the room
-        Vector2Int spawnTile = firstRoomFloors[Random.Range(0, firstRoomFloors.Count)];
-
-        // Set the player's position
-        player.transform.position = new Vector3(spawnTile.x + 0.5f, spawnTile.y + 0.5f, 0f);
-        Debug.Log("spawned player");
-
-    }
-
     #endregion
 
     #region Spawnables
@@ -306,7 +282,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     public int monsterRoom;
     private void SpawnSpawnables()
     {
-        monsterRoom = Random.Range(0, rooms.Count);
+        monsterRoom = Random.Range(1, rooms.Count);
         SpawnNPC();
         SpawnPlayer();
         SpawnStairs();

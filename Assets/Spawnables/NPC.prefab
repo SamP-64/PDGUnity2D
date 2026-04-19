@@ -102,4 +102,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   x: 0
   y: 0
-  CellType: 0
+  CellType: 8

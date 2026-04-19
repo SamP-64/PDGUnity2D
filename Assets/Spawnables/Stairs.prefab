@@ -188,3 +188,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e05c89c8bc45c047be8a141798f8581, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  x: 0
+  y: 0
+  CellType: 0
+  walkable: 1

@@ -180,6 +180,7 @@ MonoBehaviour:
   x: 0
   y: 0
   CellType: 7
+  walkable: 1
 --- !u!114 &4166529693280483685
 MonoBehaviour:
   m_ObjectHideFlags: 0

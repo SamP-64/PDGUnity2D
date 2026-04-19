@@ -41,13 +41,76 @@ public class Enemy : MonoBehaviour
             return false;
         }
     }
+    Vector2Int GetBestAdjacentToPlayer()
+    {
+        Vector2Int playerPos = new Vector2Int(pc.cellX, pc.cellY);
+
+        Vector2Int[] cardinalDirs =
+        {
+        Vector2Int.up,
+        Vector2Int.left,
+        Vector2Int.right,
+        Vector2Int.down
+    };
+
+        Vector2Int[] diagonalDirs =
+        {
+        new Vector2Int(-1, 1),
+        new Vector2Int(1, 1),
+        new Vector2Int(-1, -1),
+        new Vector2Int(1, -1)
+    };
+
+        // -------- FIRST PASS: CARDINAL --------
+        Vector2Int best = gridPos;
+        int bestDist = int.MaxValue;
+        bool found = false;
+
+        foreach (var dir in cardinalDirs)
+        {
+            Vector2Int test = playerPos + dir;
+
+            if (!Dungeon.IsValidMove(test)) continue;
+
+            int dist = Mathf.Abs(test.x - gridPos.x) + Mathf.Abs(test.y - gridPos.y);
+
+            if (dist < bestDist)
+            {
+                bestDist = dist;
+                best = test;
+                found = true;
+            }
+        }
+
+        if (found)
+            return best;
+
+        // -------- SECOND PASS: DIAGONALS --------
+        foreach (var dir in diagonalDirs)
+        {
+            Vector2Int test = playerPos + dir;
+
+            if (!Dungeon.IsValidMove(test)) continue;
+
+            int dist = Mathf.Abs(test.x - gridPos.x) + Mathf.Abs(test.y - gridPos.y);
+
+            if (dist < bestDist)
+            {
+                bestDist = dist;
+                best = test;
+            }
+        }
+
+        return best;
+    }
 
     public void MoveTowardsPlayer()
     {
         Vector2Int start = gridPos;
-        Vector2Int goal = new Vector2Int(pc.cellX, pc.cellY);
+       // Vector2Int goal = new Vector2Int(pc.cellX, pc.cellY);
+        Vector2Int goal = GetBestAdjacentToPlayer();
 
-        List<Vector2Int> path = Pathfinder.FindPath(start, goal);
+        List <Vector2Int> path = Pathfinder.FindPath(start, goal);
 
         if (path == null || path.Count < 2)
         {
@@ -67,7 +130,7 @@ public class Enemy : MonoBehaviour
 
         if (!Dungeon.IsValidMove(newPos)) { return; }
       
-        if (Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.Player || Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.Enemy )
+        if (Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.Player || Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.Enemy || Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.npc)
         {
             return;   // block movement if occupied by an enemy or player
         }
@@ -101,7 +164,7 @@ public class Enemy : MonoBehaviour
 
     public int sightRange = 9;
    
-    void RandomMove()
+    public void RandomMove()
     {
         Vector2Int[] dirs =
         {
@@ -119,22 +182,15 @@ public class Enemy : MonoBehaviour
             dirs[r] = temp;
         }
 
-        foreach (var dir in dirs)   // try each direction until valid move found
+        foreach (var dir in dirs)
         {
             Vector2Int newPos = gridPos + dir;
 
-            if (Dungeon.IsValidMove(newPos))
-            {
-                Dungeon.Grid[newPos.x, newPos.y].cellType = CellType.Enemy;
-                Dungeon.Grid[newPos.x, newPos.y].itemOnCell = this.gameObject;
-                Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;
-                Dungeon.Grid[gridPos.x, gridPos.y].itemOnCell = null;
-                gridPos = newPos;
-                transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
-         
-                return;
-            }
+            if (!Dungeon.IsValidMove(newPos))
+                continue;
 
+            MoveTo(newPos);
+            return;
         }
 
         // stand still only if completely blocked

@@ -66,6 +66,7 @@ public class PlayerController : MonoBehaviour
 
         // collision check
         if (Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Wall ||
+            Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.npc ||
             Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Enemy)
             return;
 

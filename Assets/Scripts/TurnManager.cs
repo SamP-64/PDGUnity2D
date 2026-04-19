@@ -38,6 +38,10 @@ public class TurnManager : MonoBehaviour
             {
                 enemy.MoveTowardsItem();
             }
+            else
+            {
+                enemy.RandomMove();
+            }
         }
 
         isProcessingTurn = false;

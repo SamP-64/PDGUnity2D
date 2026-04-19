@@ -103,6 +103,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridPos: {x: 0, y: 0}
+  collectedItem: {fileID: 0}
+  sightRange: 9
 --- !u!114 &2054206210335293821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115,6 +117,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e05c89c8bc45c047be8a141798f8581, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  x: 0
+  y: 0
+  CellType: 6
 --- !u!114 &986762525423227496
 MonoBehaviour:
   m_ObjectHideFlags: 0

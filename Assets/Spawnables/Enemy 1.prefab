@@ -119,7 +119,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   x: 0
   y: 0
-  CellType: 0
+  CellType: 6
 --- !u!114 &986762525423227496
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
 
     public TMP_Text scoreText;
 
-    public int floor;
+    private int floor = 1;
 
     private void Awake()
     {
