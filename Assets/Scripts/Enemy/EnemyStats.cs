@@ -1,4 +1,6 @@
 using UnityEngine;
+
+using System.Collections;
 using static UnityEditor.Progress;
 public class EnemyStats : MonoBehaviour
 {
@@ -30,6 +32,7 @@ public class EnemyStats : MonoBehaviour
     {
         currentHP = currentHP - damage;
         textLog.AddMessage("Enemy took " + damage + " damage!");
+        TakeDamageEffect();
         if (currentHP < 0)
         {
             Die();
@@ -53,4 +56,28 @@ public class EnemyStats : MonoBehaviour
         
     }
 
+   
+
+    Renderer rend;
+    Color originalColor;
+    public Color hitColor = Color.red;
+    public float flashTime = 0.1f;
+
+    void Awake()
+    {
+        rend = GetComponentInChildren<Renderer>();
+        originalColor = rend.material.color;
+
+    }
+    public void TakeDamageEffect()
+    {
+        StopAllCoroutines();
+        StartCoroutine(Flash());
+    }
+    IEnumerator Flash()
+    {
+        rend.material.color = hitColor;
+        yield return new WaitForSeconds(flashTime);
+        rend.material.color = originalColor;
+    }
 }

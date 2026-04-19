@@ -65,9 +65,7 @@ public class PlayerController : MonoBehaviour
             return;
 
         // collision check
-        if (Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Wall ||
-            Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.npc ||
-            Dungeon.Grid[targetCell.x, targetCell.y].cellType == CellType.Enemy)
+        if (!Dungeon.IsValidMove(new Vector2Int(targetCell.x, targetCell.y)))
             return;
 
         Vector3 worldPos = new Vector3( targetCell.x + 0.5f, targetCell.y + 0.5f, 0f); // move

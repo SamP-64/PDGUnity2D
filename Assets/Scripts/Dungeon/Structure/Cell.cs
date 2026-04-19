@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Cell 
 {
-    public bool traversed = true;
+    public bool traversed = false;
     public CellType cellType;
     public int roomNum;
     public int x;
