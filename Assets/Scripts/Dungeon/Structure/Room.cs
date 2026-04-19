@@ -6,7 +6,7 @@ public class Room
 
     public int num;
     public List<Cell> cells = new List<Cell>();
-
+    public Vector2Int roomCenter;
     public Room(int num)
     {
         this.num = num;

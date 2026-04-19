@@ -89,5 +89,6 @@ public enum CellType
     Coin,
     Player,
     Enemy,
-    Potion
+    Potion,
+    npc
 }

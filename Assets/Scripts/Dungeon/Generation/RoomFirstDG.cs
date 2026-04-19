@@ -36,10 +36,17 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     [SerializeField]
     private GameObject coin;
 
+    [SerializeField]
+    private GameObject npc;
+
     #region Dungeon Generation
+
+    private void Start()
+    {
+        RunProceduralGeneration();
+    }
     protected override void RunProceduralGeneration()
     {
-
         Dungeon.Initialize(dungeonHeight, dungeonWidth);
         tileMapDisplayer.ClearTileMap();
         CreateRooms();
@@ -77,7 +84,6 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         WallGenerator.CreateWalls(floor, tileMapDisplayer);
 
 
-        SpawnPlayerInRoom(0, roomsList, floor);
         SpawnSpawnables();
 
     }
@@ -118,7 +124,8 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             var roomFloor = RunRandomWalk(roomCenter, randomWalkParameters);
 
             rooms.Add(new Room(i));
-            Debug.Log(i);
+
+            rooms[i].roomCenter = roomCenter;
 
             foreach (var position in roomFloor)
             {
@@ -128,17 +135,9 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
                     position.y <= (roomBounds.yMax - roomOffset))
                 {
 
-
                     rooms[i].cells.Add(Dungeon.Grid[position.x, position.y]);
                     floor.Add(position);
                     Dungeon.Grid[position.x, position.y].roomNum = i + 1;
-
-
-                    //if(Dungeon.Grid[position.x, position.y].roomNum == 2)
-                    //{
-                    //    Instantiate(stairs, new Vector3(position.x + 0.5f, position.y + 0.5f, 0f), Quaternion.identity);
-                    //}
-
 
                 }
             }
@@ -276,25 +275,6 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         return corridor;
     }
 
-    private Vector2Int FindClosestPointTo(Vector2Int currentRoomCenter, List<Vector2Int> roomCenters)
-    {
-        Vector2Int closestPoint = Vector2Int.zero;
-        float distance = float.MaxValue;
-
-        foreach (var position in roomCenters)
-        {
-            float currentDistance = Vector2.Distance(position, currentRoomCenter);
-
-            if (currentDistance < distance)
-            {
-                distance = currentDistance;
-                closestPoint = position;
-            }
-        }
-
-        return closestPoint;
-    }
-
     private void SpawnPlayerInRoom(int roomIndex, List<BoundsInt> roomsList, HashSet<Vector2Int> floor)
     {
         BoundsInt firstRoom = roomsList[0]; // first room
@@ -316,8 +296,6 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         // Set the player's position
         player.transform.position = new Vector3(spawnTile.x + 0.5f, spawnTile.y + 0.5f, 0f);
         Debug.Log("spawned player");
-        Debug.Log(spawnTile.y);
-        Debug.Log(spawnTile.x);
 
     }
 
@@ -329,30 +307,68 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     private void SpawnSpawnables()
     {
         monsterRoom = Random.Range(0, rooms.Count);
+        SpawnNPC();
+        SpawnPlayer();
         SpawnStairs();
         SpawnPotions();
         SpawnCoins();
         SpawnEnemies();
+      
     }
+
+    private void SpawnPlayer()
+    {
+        Debug.Log("spawned player");
+
+        Room firstRoom = rooms[0];
+        Cell cell = Dungeon.Grid[firstRoom.roomCenter.x, firstRoom.roomCenter.y];
+        player.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
+        Dungeon.Grid[cell.x, cell.y].cellType = CellType.Player;
+
+        PlayerController playerController = player.GetComponent<PlayerController >();
+        playerController.cellX = Mathf.FloorToInt(player.transform.position.x);
+        playerController.cellY = Mathf.FloorToInt(player.transform.position.y);
+
+        Dungeon.RevealAroundPlayer(playerController.cellX, playerController.cellY);
+    }
+
     private void SpawnPotions()
     {
         for (int i = 0; i < rooms.Count; i++)
         {
            Cell cell = rooms[i].GetRandomFloorCell();
            GameObject potionRef = Instantiate(potion, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
-           potionRef.GetComponent<Spawnable>().x = cell.y;
+           potionRef.GetComponent<Spawnable>().x = cell.x;
            potionRef.GetComponent<Spawnable>().y = cell.y;
            Dungeon.Grid[cell.x, cell.y].cellType = CellType.Potion;
            Dungeon.Grid[cell.x, cell.y].itemOnCell = potionRef;
         }
     }
+    private void SpawnNPC()
+    {
+
+       int npcRoom = Random.Range(0, rooms.Count);
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            if (i == npcRoom)
+            {
+                Cell cell = Dungeon.Grid[rooms[i].roomCenter.x, rooms[i].roomCenter.y];
+                GameObject npcRef = Instantiate(npc, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+                npcRef.GetComponent<Spawnable>().x = cell.x;
+                npcRef.GetComponent<Spawnable>().y = cell.y;
+                Dungeon.Grid[cell.x, cell.y].cellType = CellType.npc;
+            }
+          
+        }
+    }
+
     private void SpawnCoins()
     {
         for (int i = 0; i < rooms.Count; i++)
         {
             Cell cell = rooms[i].GetRandomFloorCell();
             GameObject coinRef = Instantiate(coin, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
-            coinRef.GetComponent<Spawnable>().x = cell.y;
+            coinRef.GetComponent<Spawnable>().x = cell.x;
             coinRef.GetComponent<Spawnable>().y = cell.y;
             Dungeon.Grid[cell.x, cell.y].cellType = CellType.Coin;
             Dungeon.Grid[cell.x, cell.y].itemOnCell = coinRef;

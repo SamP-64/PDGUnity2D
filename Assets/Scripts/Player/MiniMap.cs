@@ -74,6 +74,9 @@ public class MiniMap : MonoBehaviour
                     case CellType.Potion:
                         minimapTiles[x, y].color = Color.green;
                         break;
+                    case CellType.npc:
+                        minimapTiles[x, y].color = Color.cyan;
+                        break;
                     case CellType.Empty:
                         minimapTiles[x, y].color = Color.clear;
                         break;
