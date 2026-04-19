@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -104,24 +105,24 @@ public class Enemy : MonoBehaviour
         return best;
     }
 
-    public void MoveTowardsPlayer()
+    public IEnumerator MoveTowardsPlayer()
     {
         Vector2Int start = gridPos;
-       // Vector2Int goal = new Vector2Int(pc.cellX, pc.cellY);
         Vector2Int goal = GetBestAdjacentToPlayer();
 
-        List <Vector2Int> path = Pathfinder.FindPath(start, goal);
+        List<Vector2Int> path = Pathfinder.FindPath(start, goal);
 
         if (path == null || path.Count < 2)
         {
-            RandomMove();
-            return;
+            yield return RandomMove();
+            yield break;
         }
 
-        Debug.Log("moved");
         MoveTo(path[1]);
+
+        yield return null;
     }
-  
+
 
 
     void MoveTo(Vector2Int newPos)
@@ -163,18 +164,18 @@ public class Enemy : MonoBehaviour
     }
 
     public int sightRange = 9;
-   
-    public void RandomMove()
+
+    public IEnumerator RandomMove()
     {
         Vector2Int[] dirs =
         {
-            Vector2Int.up,
-            Vector2Int.down,
-            Vector2Int.left,
-            Vector2Int.right
-        };
+        Vector2Int.up,
+        Vector2Int.down,
+        Vector2Int.left,
+        Vector2Int.right
+    };
 
-        for (int i = 0; i < dirs.Length; i++) // shuffle directions
+        for (int i = 0; i < dirs.Length; i++)
         {
             Vector2Int temp = dirs[i];
             int r = Random.Range(i, dirs.Length);
@@ -190,13 +191,13 @@ public class Enemy : MonoBehaviour
                 continue;
 
             MoveTo(newPos);
-            return;
+            break;
         }
 
-        // stand still only if completely blocked
+        yield return null;
     }
 
-    public void MoveTowardsItem()
+    public IEnumerator MoveTowardsItem()
     {
         Vector2Int start = gridPos;
 
@@ -204,12 +205,13 @@ public class Enemy : MonoBehaviour
 
         if (path == null || path.Count < 2)
         {
-            RandomMove();
-            return;
+            yield return RandomMove();
+            yield break;
         }
 
-        Debug.Log("moved");
         MoveTo(path[1]);
+
+        yield return null;
     }
     public Vector2Int FindNearestItem()
     {
@@ -267,12 +269,16 @@ public class Enemy : MonoBehaviour
         return items;
     }
 
-    public void Attack()
+    public IEnumerator Attack()
     {
         int damage = DamageCalculator.CalculateDamage(enemyStats.level, enemyStats.attack, 50, ps.level);
+
         ps.ApplyDamage(damage);
-        enemyStats.currentHP = enemyStats.currentHP - damage;
+        enemyStats.currentHP -= damage;
+
         textLog.AddMessage("Player took " + damage + " damage!");
+
+        yield return null;
     }
 
 }

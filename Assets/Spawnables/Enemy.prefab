@@ -120,6 +120,7 @@ MonoBehaviour:
   x: 0
   y: 0
   CellType: 6
+  walkable: 0
 --- !u!114 &986762525423227496
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,7 +134,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level: 2
-  maxHP: 15
-  currentHP: 15
+  maxHP: 44
+  currentHP: 44
   attack: 3
   defence: 4
+  hitColor: {r: 1, g: 0, b: 0, a: 1}
+  flashTime: 0.1

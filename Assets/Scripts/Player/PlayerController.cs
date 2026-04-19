@@ -33,6 +33,9 @@ public class PlayerController : MonoBehaviour
         CheckHoldingKey();
         MiniMap.DrawMinimap();
         SetInputDirection();
+        if (TurnManager.Instance.IsTurnRunning())
+            return;
+
         CheckAttack();
     }
 
@@ -48,7 +51,7 @@ public class PlayerController : MonoBehaviour
 
         Vector2Int movement = inputDir;
 
-        if (holdTime < 1f) 
+        if (holdTime < 0.2f) 
         {
             inputDir = Vector2Int.zero;
         }
@@ -95,7 +98,7 @@ public class PlayerController : MonoBehaviour
                 textLog.AddMessage("You Found a Monster House!");
                 dg.SpawnMonsterHouse();
             }
-            
+                    
             StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
 
             Dungeon.RevealAroundPlayer(cellX, cellY);
@@ -126,7 +129,7 @@ public class PlayerController : MonoBehaviour
     {
         if (inputDir == Vector2Int.zero)
         {
-            turnDelay = 0.1f;
+            turnDelay = 0.6f;
             if (Input.GetKeyDown(KeyCode.A)) inputDir = Vector2Int.left;
             else if (Input.GetKeyDown(KeyCode.D)) inputDir = Vector2Int.right;
             else if (Input.GetKeyDown(KeyCode.W)) inputDir = Vector2Int.up;
@@ -261,7 +264,7 @@ public class PlayerController : MonoBehaviour
         }
 
         TurnManager.Instance.EndTurn();
-        StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
+        StartCoroutine(TurnManager.Instance.NextTurn(0f));
     }
 
     void SpawnFX(Vector2Int cell, Vector2Int dir)
@@ -284,4 +287,6 @@ public class PlayerController : MonoBehaviour
     }
 
     #endregion
+
+
 }

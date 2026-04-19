@@ -1,4 +1,6 @@
 using UnityEngine;
+
+using System.Collections;
 using TMPro;
 
 public class PlayerStats : MonoBehaviour
@@ -33,8 +35,10 @@ public class PlayerStats : MonoBehaviour
 
     public void ApplyDamage(int damage) // Method to decrease player health
     {
+
         currentHP = currentHP - damage;
         UpdateText();
+        TakeDamageEffect();
     }
 
     public void RestoreHealth(int restoreValue) // Method to increase player health
@@ -49,4 +53,26 @@ public class PlayerStats : MonoBehaviour
         UpdateText();
     }
 
+    Renderer rend;
+    Color originalColor;
+    public Color hitColor = Color.red;
+    public float flashTime = 0.1f;
+
+    void Awake()
+    {
+        rend = GetComponentInChildren<Renderer>();
+        originalColor = rend.material.color;
+
+    }
+    public void TakeDamageEffect()
+    {
+        StopAllCoroutines();
+        StartCoroutine(Flash());
+    }
+    IEnumerator Flash()
+    {
+        rend.material.color = hitColor;
+        yield return new WaitForSeconds(flashTime);
+        rend.material.color = originalColor;
+    }
 }

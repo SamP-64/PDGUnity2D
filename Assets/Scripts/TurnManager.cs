@@ -28,19 +28,19 @@ public class TurnManager : MonoBehaviour
         {
             if (enemy.IsNextToPlayer())
             {
-                enemy.Attack();
+                yield return enemy.Attack();
             }
             else if (enemy.GetDistanceFromPlayer() < enemy.sightRange)
             {
-                enemy.MoveTowardsPlayer();
+                yield return enemy.MoveTowardsPlayer();
             }
             else if (enemy.collectedItem == null)
             {
-                enemy.MoveTowardsItem();
+                yield return enemy.MoveTowardsItem();
             }
             else
             {
-                enemy.RandomMove();
+                yield return enemy.RandomMove();
             }
         }
 
