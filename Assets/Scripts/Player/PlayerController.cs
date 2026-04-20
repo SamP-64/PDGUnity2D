@@ -155,6 +155,7 @@ public class PlayerController : MonoBehaviour
         {
             DestroyCollidedObject(other);
             textLog.AddMessage("Player Collected " + "5" + " Gold!");
+            Dungeon.Grid[cellX, cellY ].cellType = CellType.Player ;
             return;
         }
         else if (other.TryGetComponent(out Potion potion))
@@ -185,16 +186,16 @@ public class PlayerController : MonoBehaviour
     {
         // attack
         if (Input.GetKeyDown(KeyCode.UpArrow))
-            Attack(cellX, cellY + 1);
+            StartCoroutine(Attack(cellX, cellY + 1));
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
-            Attack(cellX, cellY - 1);
+            StartCoroutine(Attack(cellX, cellY - 1));
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
-            Attack(cellX - 1, cellY);
+            StartCoroutine(Attack(cellX - 1, cellY));
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
-            Attack(cellX + 1, cellY);
+            StartCoroutine(Attack(cellX + 1, cellY));
 
         if (Input.GetKeyDown(KeyCode.I)) RangedAttack(Vector2Int.up);
         if (Input.GetKeyDown(KeyCode.K)) RangedAttack(Vector2Int.down);
@@ -202,23 +203,45 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.L)) RangedAttack(Vector2Int.right);
     }
 
-    void Attack(int x, int y)
+    IEnumerator Attack(int x, int y)
     {
         if (x < 0 || x >= Dungeon.Grid.GetLength(0) ||
             y < 0 || y >= Dungeon.Grid.GetLength(1))
-            return;
+            yield break;
 
         var cell = Dungeon.Grid[x, y];
 
+        // store BEFORE animation
+        Vector3 originalPos = transform.position;
+        Vector3 targetPos = new Vector3(x + 0.5f, y + 0.5f, 0f);
+
+        // lunge forward
+        transform.position = Vector3.Lerp(originalPos, targetPos, 0.3f);
+
+        yield return new WaitForSeconds(0.1f);
+
+        // damage happens DURING hit (feels better)
         if (cell.itemOnCell != null)
         {
-            if (cell.itemOnCell.GetComponent<EnemyStats>() != null)
+            if (cell.itemOnCell.TryGetComponent<EnemyStats>(out var enemyStats))
             {
-                EnemyStats enemyStats = cell.itemOnCell.GetComponent<EnemyStats>();
-                int damage = DamageCalculator.CalculateDamage(playerStats.level, playerStats.attack, 50, enemyStats.defence);
+                int damage = DamageCalculator.CalculateDamage(
+                    playerStats.level,
+                    playerStats.attack,
+                    50,
+                    enemyStats.defence
+                );
+
                 enemyStats.ApplyDamage(damage);
             }
         }
+
+        yield return new WaitForSeconds(0.2f);
+
+        // move back
+        transform.position = originalPos;
+
+        yield return new WaitForSeconds(0.05f);
 
         StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
     }

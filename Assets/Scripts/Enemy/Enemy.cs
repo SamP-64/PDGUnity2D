@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
     public Vector2Int gridPos;
     public GameObject collectedItem;
 
-    PlayerController pc;
+    public PlayerController pc;
     PlayerStats ps;
     TextLog textLog;
     public EnemyStats enemyStats;
@@ -272,7 +272,6 @@ public class Enemy : MonoBehaviour
     public IEnumerator Attack()
     {
 
-        
         Vector3 originalPos = transform.position;
         Vector3 targetPos = new Vector3(pc.cellX + 0.5f, pc.cellY + 0.5f, 0f);
 
@@ -280,7 +279,6 @@ public class Enemy : MonoBehaviour
         transform.position = Vector3.Lerp(originalPos, targetPos, 0.3f);
 
         yield return new WaitForSeconds(0.05f);
-
 
         int damage = DamageCalculator.CalculateDamage(enemyStats.level, enemyStats.attack, 50, ps.level);
 

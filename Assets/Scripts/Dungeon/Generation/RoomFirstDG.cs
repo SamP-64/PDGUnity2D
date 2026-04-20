@@ -328,7 +328,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         {
             if (i == npcRoom)
             {
-                Cell cell = Dungeon.Grid[rooms[i].roomCenter.x, rooms[i].roomCenter.y];
+                Cell cell = rooms[i].GetRandomFloorCell();
                 GameObject npcRef = Instantiate(npc, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
                 npcRef.GetComponent<Spawnable>().x = cell.x;
                 npcRef.GetComponent<Spawnable>().y = cell.y;
@@ -355,7 +355,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         for (int i = 0; i < rooms.Count; i++)
         {
             Cell cell = rooms[i].GetRandomFloorCell();
-            GameObject enemyRef = Instantiate(enemy, new Vector3(cell.x + 0.5f, cell.y + 0f, 0f), Quaternion.identity);
+            GameObject enemyRef = Instantiate(enemy, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
             Dungeon.Grid[cell.x, cell.y].cellType = CellType.Enemy;
             Enemy enemyScript = enemyRef.GetComponent<Enemy>();
             enemyScript.SetStartPosition(new Vector2Int (cell.x, cell.y));

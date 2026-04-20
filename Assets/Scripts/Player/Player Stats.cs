@@ -41,6 +41,10 @@ public class PlayerStats : MonoBehaviour
         TakeDamageEffect();
     }
 
+    public void GainExp(int exp)
+    {
+        Debug.Log(exp);
+    }
     public void RestoreHealth(int restoreValue) // Method to increase player health
     {
         currentHP = currentHP + restoreValue;

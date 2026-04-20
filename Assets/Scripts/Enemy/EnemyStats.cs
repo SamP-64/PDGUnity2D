@@ -58,19 +58,20 @@ public class EnemyStats : MonoBehaviour
 
         Destroy(gameObject);
         textLog.AddMessage("Player Defeated Enemy!");
+        int exp = ExpCalculator.CalculateXPFast(level);
+        enemy.pc.playerStats.GainExp(exp);
     }
 
 
-
-    Renderer rend;
-    Color originalColor;
-    public Color hitColor = Color.red;
-    public float flashTime = 0.1f;
+    Renderer renderer;
+    Color originalColour;
+    Color hitColour = Color.red;
+    float flashTime = 0.1f;
 
     void Awake()
     {
-        rend = GetComponentInChildren<Renderer>();
-        originalColor = rend.material.color;
+        renderer = GetComponentInChildren<Renderer>();
+        originalColour = renderer.material.color;
 
     }
     public void TakeDamageEffect()
@@ -80,9 +81,9 @@ public class EnemyStats : MonoBehaviour
     }
     IEnumerator Flash()
     {
-        rend.material.color = hitColor;
+        renderer.material.color = hitColour;
         yield return new WaitForSeconds(flashTime);
-        rend.material.color = originalColor;
+        renderer.material.color = originalColour;
     }
 
     public IEnumerator DieEffect()
