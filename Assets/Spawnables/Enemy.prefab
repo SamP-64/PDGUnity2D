@@ -134,9 +134,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level: 2
-  maxHP: 44
-  currentHP: 44
+  maxHP: 10
+  currentHP: 10
   attack: 3
   defence: 4
+  dead: 0
   hitColor: {r: 1, g: 0, b: 0, a: 1}
   flashTime: 0.1

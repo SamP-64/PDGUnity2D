@@ -13,7 +13,7 @@ public class Enemy : MonoBehaviour
     PlayerController pc;
     PlayerStats ps;
     TextLog textLog;
-    EnemyStats enemyStats;
+    public EnemyStats enemyStats;
     
 
     public void SetPosition(Vector2Int pos)
@@ -271,6 +271,17 @@ public class Enemy : MonoBehaviour
 
     public IEnumerator Attack()
     {
+
+        
+        Vector3 originalPos = transform.position;
+        Vector3 targetPos = new Vector3(pc.cellX + 0.5f, pc.cellY + 0.5f, 0f);
+
+        // move halfway toward player
+        transform.position = Vector3.Lerp(originalPos, targetPos, 0.3f);
+
+        yield return new WaitForSeconds(0.05f);
+
+
         int damage = DamageCalculator.CalculateDamage(enemyStats.level, enemyStats.attack, 50, ps.level);
 
         ps.ApplyDamage(damage);
@@ -278,7 +289,12 @@ public class Enemy : MonoBehaviour
 
         textLog.AddMessage("Player took " + damage + " damage!");
 
-        yield return null;
+        yield return new WaitForSeconds(0.5f);
+
+        // move back
+        transform.position = originalPos;
+
+        yield return new WaitForSeconds(0.05f);
     }
 
 }

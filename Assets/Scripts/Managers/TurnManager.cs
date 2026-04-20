@@ -17,6 +17,7 @@ public class TurnManager : MonoBehaviour
     public IEnumerator NextTurn(float waitTime)
     {
         if (isProcessingTurn) { yield break; }
+    
 
         isProcessingTurn = true;
 
@@ -26,6 +27,11 @@ public class TurnManager : MonoBehaviour
 
         foreach (Enemy enemy in enemies)
         {
+            if (enemy.enemyStats.dead == true)
+            {
+                continue;
+            }
+
             if (enemy.IsNextToPlayer())
             {
                 yield return enemy.Attack();

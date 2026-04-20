@@ -54,7 +54,7 @@ public static class Dungeon
         }
     }
 
-    public static void ResetRoomNums(int width, int height)  // Optional helper to initialize the grid
+    public static void ResetRoomNums(int width, int height)  // Reset the floors room nums
     {
         for (int x = 0; x < width; x++)
         {
@@ -71,7 +71,7 @@ public static class Dungeon
         if (pos.x < 0 || pos.y < 0)
             return false;
 
-        if (Dungeon.Grid[pos.x, pos.y].cellType == CellType.Floor || Dungeon.Grid[pos.x, pos.y].cellType == CellType.Coin || Dungeon.Grid[pos.x, pos.y].cellType == CellType.Potion)
+        if (Dungeon.Grid[pos.x, pos.y].cellType == CellType.Floor || Dungeon.Grid[pos.x, pos.y].cellType == CellType.Coin || Dungeon.Grid[pos.x, pos.y].cellType == CellType.Potion || Dungeon.Grid[pos.x, pos.y].cellType == CellType.Stairs)
         {
             return true;
         }

@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
         CheckAttack();
     }
 
-    private Vector2Int lastCell = new Vector2Int(40, 40);
+    private Vector2Int lastCell = new Vector2Int(0, 0);
     void FixedUpdate()
     {
 
@@ -129,7 +129,7 @@ public class PlayerController : MonoBehaviour
     {
         if (inputDir == Vector2Int.zero)
         {
-            turnDelay = 0.6f;
+            turnDelay = 0.3f;
             if (Input.GetKeyDown(KeyCode.A)) inputDir = Vector2Int.left;
             else if (Input.GetKeyDown(KeyCode.D)) inputDir = Vector2Int.right;
             else if (Input.GetKeyDown(KeyCode.W)) inputDir = Vector2Int.up;

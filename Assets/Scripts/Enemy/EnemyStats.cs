@@ -9,7 +9,7 @@ public class EnemyStats : MonoBehaviour
     public int currentHP;
     public int attack;
     public int defence;
-
+    public bool dead = false;
     Enemy enemy;
     TextLog textLog;
     public void IntializeStats(int level, int hp, int atk, int def)
@@ -33,30 +33,34 @@ public class EnemyStats : MonoBehaviour
         currentHP = currentHP - damage;
         textLog.AddMessage("Enemy took " + damage + " damage!");
         TakeDamageEffect();
-        if (currentHP < 0)
+        if (currentHP <= 0)
         {
-            Die();
+            dead = true;
+            StartCoroutine(DieRoutine());
         }
     }
 
-    void Die()
+    IEnumerator DieRoutine()
     {
+        yield return StartCoroutine(DieEffect());
+
         Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType = CellType.Floor;
 
         if (enemy.collectedItem != null)
         {
-            Debug.Log(enemy.collectedItem.name);
-            textLog.AddMessage("Player Defeated Enemy!");
-            Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType = enemy.collectedItem.GetComponent<Spawnable>().CellType;
-            enemy.collectedItem.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 0f);
-            enemy.collectedItem.gameObject.SetActive(true);
+            
+            Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType =
+            enemy.collectedItem.GetComponent<Spawnable>().CellType;
+
+            enemy.collectedItem.transform.position = transform.position;
+            enemy.collectedItem.SetActive(true);
         }
 
-        Destroy(this.gameObject);
-        
+        Destroy(gameObject);
+        textLog.AddMessage("Player Defeated Enemy!");
     }
 
-   
+
 
     Renderer rend;
     Color originalColor;
@@ -79,5 +83,36 @@ public class EnemyStats : MonoBehaviour
         rend.material.color = hitColor;
         yield return new WaitForSeconds(flashTime);
         rend.material.color = originalColor;
+    }
+
+    public IEnumerator DieEffect()
+    {
+        Transform t = transform;
+        Renderer rend = GetComponentInChildren<Renderer>();
+
+        Color original = rend.material.color;
+
+        // flash white/red
+        rend.material.color = Color.white;
+
+        yield return new WaitForSeconds(0.05f);
+
+        rend.material.color = Color.red;
+
+        // shrink
+        float duration = 0.7f;
+        float time = 0f;
+
+        Vector3 startScale = t.localScale;
+
+        while (time < duration)
+        {
+            float tLerp = time / duration;
+            t.localScale = Vector3.Lerp(startScale, Vector3.zero, tLerp);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        t.localScale = Vector3.zero;
     }
 }

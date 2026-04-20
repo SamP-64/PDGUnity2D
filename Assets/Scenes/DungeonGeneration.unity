@@ -287,8 +287,6 @@ MonoBehaviour:
   tileMapDisplayer: {fileID: 172064601}
   startPosition: {x: 20, y: 20}
   randomWalkParameters: {fileID: 11400000, guid: e9adfdf90709bde4cbd062054c58a44f, type: 2}
-  width: 0
-  height: 0
   corridorLength: 24
   corridorCount: 16
   roomPercent: 0.748
@@ -445,8 +443,6 @@ MonoBehaviour:
   tileMapDisplayer: {fileID: 172064601}
   startPosition: {x: 50, y: 50}
   randomWalkParameters: {fileID: 11400000, guid: 8133cc451f162a1499ea66ab9cf14a72, type: 2}
-  width: 20
-  height: 20
 --- !u!4 &467351714
 Transform:
   m_ObjectHideFlags: 0
@@ -31986,12 +31982,10 @@ MonoBehaviour:
   tileMapDisplayer: {fileID: 172064601}
   startPosition: {x: 0, y: 0}
   randomWalkParameters: {fileID: 11400000, guid: e9adfdf90709bde4cbd062054c58a44f, type: 2}
-  width: 20
-  height: 20
   minRoomWidth: 9
   minRoomHeight: 9
-  dungeonWidth: 77
-  dungeonHeight: 82
+  dungeonWidth: 50
+  dungeonHeight: 50
   randomWalkRooms: 1
   roomOffset: 2
   player: {fileID: 2002937525}
