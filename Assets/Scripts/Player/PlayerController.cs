@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     float turnDelay = 0.1f;
     bool holding = false;
     float holdTime;
-    public int score = 0;
+    public int coins = 0;
     Vector2Int inputDir = Vector2Int.zero;
  
     [SerializeField] private int currentRoomNum;
@@ -155,8 +155,10 @@ public class PlayerController : MonoBehaviour
         if (other.TryGetComponent(out Coin coin))
         {
             DestroyCollidedObject(other);
-            textLog.AddMessage("Player Collected " + "5" + " Gold!");
-            Dungeon.Grid[cellX, cellY ].cellType = CellType.Player ;
+            int coinValue = Random.Range(5, 16);
+            textLog.AddMessage("Player Collected " + coinValue  + " Gold!");
+            coins = coins + coinValue;
+            Dungeon.Grid[cellX, cellY].cellType = CellType.Player ;
             return;
         }
         else if (other.TryGetComponent(out Potion potion))
@@ -223,10 +225,9 @@ public class PlayerController : MonoBehaviour
 
         yield return new WaitForSeconds(0.1f);
 
-        // damage happens DURING hit (feels better)
-        if (cell.itemOnCell != null)
+        if (cell.enemyOnCell != null)
         {
-            if (cell.itemOnCell.TryGetComponent<EnemyStats>(out var enemyStats))
+            if (cell.enemyOnCell.TryGetComponent<EnemyStats>(out var enemyStats))
             {
                 int damage = DamageCalculator.CalculateDamage(
                     playerStats.level,
@@ -279,11 +280,11 @@ public class PlayerController : MonoBehaviour
             if (cell.cellType == CellType.Wall)
                 break;
 
-            if (cell.itemOnCell != null && cell.itemOnCell.TryGetComponent<EnemyStats>(out var enemy))
+            if (cell.enemyOnCell  != null )
             {
-                int dmg = DamageCalculator.CalculateDamage(playerStats.level, playerStats.attack, 50, enemy.defence);
+                int dmg = DamageCalculator.CalculateDamage(playerStats.level, playerStats.attack, 50, cell.enemyOnCell.GetComponent<EnemyStats>().defence);
 
-                enemy.ApplyDamage(dmg);
+                cell.enemyOnCell.GetComponent<EnemyStats>().ApplyDamage(dmg);
                 break;
             }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
-using static UnityEditor.Progress;
+//using static UnityEditor.Progress;
 
 public class Enemy : MonoBehaviour
 {
@@ -31,6 +31,7 @@ public class Enemy : MonoBehaviour
         textLog = FindObjectOfType<TextLog>();
     }
 
+    #region Find Player
     public bool IsNextToPlayer()
     {
         if (Mathf.Abs(pc.cellX - gridPos.x) + Mathf.Abs(pc.cellY - gridPos.y) == 1)
@@ -102,15 +103,9 @@ public class Enemy : MonoBehaviour
                 best = test;
             }
         }
-
+        
         return best;
     }
-
-   
-
-
-
-    
 
     public int GetDistanceFromPlayer()
     {
@@ -118,7 +113,7 @@ public class Enemy : MonoBehaviour
 
          return distToPlayer;
     }
-
+    #endregion 
     #region Enemy Movement
     void MoveTo(Vector2Int newPos)
     {
@@ -142,9 +137,10 @@ public class Enemy : MonoBehaviour
 
         Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;  // clear old tile
         Dungeon.Grid[gridPos.x, gridPos.y].itemOnCell = null;
+        Dungeon.Grid[gridPos.x, gridPos.y].enemyOnCell = null;
 
         Dungeon.Grid[newPos.x, newPos.y].cellType = CellType.Enemy;   // set new tile
-        Dungeon.Grid[newPos.x, newPos.y].itemOnCell = this.gameObject;
+        Dungeon.Grid[newPos.x, newPos.y].enemyOnCell  = this.gameObject;
 
         gridPos = newPos;  // update position
         transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
@@ -271,7 +267,7 @@ public class Enemy : MonoBehaviour
         return items;
     }
     #endregion
-    #region 
+    #region Atatck
     public IEnumerator Attack()
     {
 
@@ -297,5 +293,5 @@ public class Enemy : MonoBehaviour
 
         yield return new WaitForSeconds(0.05f);
     }
-
+    #endregion
 }

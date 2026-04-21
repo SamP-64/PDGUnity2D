@@ -43,9 +43,11 @@ public class EnemyStats : MonoBehaviour
     #region Damage Effect
     IEnumerator DieRoutine()
     {
-        yield return StartCoroutine(DieEffect());
 
         Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType = CellType.Floor;
+        yield return StartCoroutine(DieEffect());
+
+    
 
         if (enemy.collectedItem != null)
         {

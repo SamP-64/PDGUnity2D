@@ -8,6 +8,7 @@ public class Cell
     public int x;
     public int y;
     public GameObject itemOnCell;
+    public GameObject enemyOnCell;
     public bool walkable = true;
    
 }

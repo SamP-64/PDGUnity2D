@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public TMP_Text scoreText;
+    public TMP_Text floorText;
 
     private int floor = 1;
 
@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
     {
         dungeonGenerator.GenerateDungeon();
         floor = floor + 1;
-        scoreText.text = "Floor : " + floor;
+        floorText.text = "Floor : " + floor;
         Debug.Log("next");
     }
 }
