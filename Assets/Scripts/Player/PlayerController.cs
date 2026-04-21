@@ -19,13 +19,14 @@ public class PlayerController : MonoBehaviour
     float holdTime;
     public int score = 0;
     Vector2Int inputDir = Vector2Int.zero;
-   [SerializeField] private int currentRoomNum;
+ 
+    [SerializeField] private int currentRoomNum;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         playerStats = GetComponent<PlayerStats>();
-        playerStats.IntializeStats(5, 20, 8, 8);
+        playerStats.IntializeStats(1, 20, 8, 8);
     }
 
     void Update()
@@ -93,7 +94,7 @@ public class PlayerController : MonoBehaviour
 
             currentRoomNum = Dungeon.Grid[newCell.x, newCell.y].roomNum;
 
-          if (  Dungeon.Grid[newCell.x, newCell.y].roomNum == dg.monsterRoom)
+          if(Dungeon.Grid[newCell.x, newCell.y].roomNum == dg.monsterRoom)
             {
                 textLog.AddMessage("You Found a Monster House!");
                 dg.SpawnMonsterHouse();
@@ -209,6 +210,8 @@ public class PlayerController : MonoBehaviour
             y < 0 || y >= Dungeon.Grid.GetLength(1))
             yield break;
 
+        TurnManager.Instance.StartTurn();
+
         var cell = Dungeon.Grid[x, y];
 
         // store BEFORE animation
@@ -243,6 +246,7 @@ public class PlayerController : MonoBehaviour
 
         yield return new WaitForSeconds(0.05f);
 
+        TurnManager.Instance.EndTurn();
         StartCoroutine(TurnManager.Instance.NextTurn(turnDelay));
     }
     #endregion

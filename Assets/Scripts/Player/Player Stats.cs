@@ -13,6 +13,9 @@ public class PlayerStats : MonoBehaviour
 
     PlayerController pc;
 
+    int currentExp;
+    int expToLevel;
+
     [SerializeField] TMP_Text levelText;
     [SerializeField] TMP_Text hpText;
 
@@ -44,7 +47,33 @@ public class PlayerStats : MonoBehaviour
     public void GainExp(int exp)
     {
         Debug.Log(exp);
+
+        currentExp += exp;
+
+        while (currentExp >= GetExpToNextLevel(level))
+        {
+            int needed = GetExpToNextLevel(level);
+
+            int overflowExp = currentExp - needed;
+
+            Debug.Log("Level Up");
+
+            level++;
+            currentExp = overflowExp;
+        }
+
+        UpdateText();
     }
+
+    int GetLevelUpExp(int level)
+    {
+        return level * level * level;
+    }
+    int GetExpToNextLevel(int level)
+    {
+        return GetLevelUpExp(level + 1) - GetLevelUpExp(level);
+    }
+
     public void RestoreHealth(int restoreValue) // Method to increase player health
     {
         currentHP = currentHP + restoreValue;
