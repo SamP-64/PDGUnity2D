@@ -8,9 +8,9 @@ public class MiniMap : MonoBehaviour
     [SerializeField] private RectTransform minimapParent;
     [SerializeField] private float tileSize = 6f;
 
-    [SerializeField] private RoomFirstDG dg;
+    [SerializeField] private RoomFirstDG dg; // Generator reference
 
-    [SerializeField] private Vector2 offset;
+    [SerializeField] private Vector2 offset; // Position offset on screen
 
     private void Start()
     {
@@ -19,7 +19,7 @@ public class MiniMap : MonoBehaviour
 
     private Image[,] minimapTiles;
 
-    void InitializeMinimap()
+    void InitializeMinimap() 
     {
         minimapTiles = new Image[dg.dungeonWidth, dg.dungeonHeight];
 
@@ -43,7 +43,7 @@ public class MiniMap : MonoBehaviour
         }
     }
 
-    public void DrawMinimap()
+    public void DrawMinimap() // Method to Draw Minimap on Screen
     {
         for (int x = 0; x < dg.dungeonWidth ; x++)
         {
@@ -51,13 +51,13 @@ public class MiniMap : MonoBehaviour
             {
                 Cell cell = Dungeon.Grid[x, y];
 
-                if (!cell.traversed)
+                if (!cell.traversed) // Only Paint Cell if it has been traversed
                 {
                     minimapTiles[x, y].color = Color.clear;
                     continue;
                 }
 
-                switch (cell.cellType)
+                switch (cell.cellType) // Paint Minimap depending on what each cell contains
                 {
                     case CellType.Wall:
                         minimapTiles[x, y].color = Color.gray;

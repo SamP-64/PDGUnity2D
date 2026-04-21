@@ -19,7 +19,6 @@ public class EnemyStats : MonoBehaviour
         this.currentHP = hp;
         this.attack = atk;
         this.defence = def;
-  
     }
 
     private void Start()
@@ -28,6 +27,7 @@ public class EnemyStats : MonoBehaviour
         enemy = gameObject.GetComponent<Enemy>();
     }
 
+    #region TakeDamage
     public void ApplyDamage(int damage)
     {
         currentHP = currentHP - damage;
@@ -39,7 +39,8 @@ public class EnemyStats : MonoBehaviour
             StartCoroutine(DieRoutine());
         }
     }
-
+    #endregion 
+    #region Damage Effect
     IEnumerator DieRoutine()
     {
         yield return StartCoroutine(DieEffect());
@@ -93,27 +94,26 @@ public class EnemyStats : MonoBehaviour
 
         Color original = rend.material.color;
 
-        // flash white/red
         rend.material.color = Color.white;
 
         yield return new WaitForSeconds(0.05f);
 
-        rend.material.color = Color.red;
+        rend.material.color = Color.red; // Flash Sprite Red
 
-        // shrink
         float duration = 0.7f;
         float time = 0f;
 
         Vector3 startScale = t.localScale;
 
-        while (time < duration)
+        while (time < duration) // Shrink for duration
         {
             float tLerp = time / duration;
-            t.localScale = Vector3.Lerp(startScale, Vector3.zero, tLerp);
+            t.localScale = Vector3.Lerp(startScale, Vector3.zero, tLerp);  // shrink enemy
             time += Time.deltaTime;
             yield return null;
         }
 
         t.localScale = Vector3.zero;
     }
+    #endregion
 }

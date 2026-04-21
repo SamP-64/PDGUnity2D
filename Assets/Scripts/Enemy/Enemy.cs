@@ -14,7 +14,7 @@ public class Enemy : MonoBehaviour
     PlayerStats ps;
     TextLog textLog;
     public EnemyStats enemyStats;
-    
+    public int sightRange = 9;
 
     public void SetPosition(Vector2Int pos)
     {
@@ -42,6 +42,7 @@ public class Enemy : MonoBehaviour
             return false;
         }
     }
+
     Vector2Int GetBestAdjacentToPlayer()
     {
         Vector2Int playerPos = new Vector2Int(pc.cellX, pc.cellY);
@@ -105,6 +106,50 @@ public class Enemy : MonoBehaviour
         return best;
     }
 
+   
+
+
+
+    
+
+    public int GetDistanceFromPlayer()
+    {
+         int distToPlayer = Mathf.Abs(pc.cellX - gridPos.x) + Mathf.Abs(pc.cellY - gridPos.y);
+
+         return distToPlayer;
+    }
+
+    #region Enemy Movement
+    void MoveTo(Vector2Int newPos)
+    {
+        if (newPos == gridPos) { return; }
+
+        if (!Dungeon.IsValidMove(newPos)) { return; }
+
+        if (Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.Player || Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.Enemy || Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.npc)
+        {
+            return;   // block movement if occupied by an enemy or player
+        }
+
+        var cell = Dungeon.Grid[newPos.x, newPos.y];
+
+        if (cell.itemOnCell != null && cell.itemOnCell.TryGetComponent<Item>(out var item))
+        {
+            Debug.Log("Destroy");
+            collectedItem = cell.itemOnCell;
+            collectedItem.gameObject.SetActive(false);
+        }
+
+        Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;  // clear old tile
+        Dungeon.Grid[gridPos.x, gridPos.y].itemOnCell = null;
+
+        Dungeon.Grid[newPos.x, newPos.y].cellType = CellType.Enemy;   // set new tile
+        Dungeon.Grid[newPos.x, newPos.y].itemOnCell = this.gameObject;
+
+        gridPos = newPos;  // update position
+        transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
+
+    }
     public IEnumerator MoveTowardsPlayer()
     {
         Vector2Int start = gridPos;
@@ -122,49 +167,6 @@ public class Enemy : MonoBehaviour
 
         yield return null;
     }
-
-
-
-    void MoveTo(Vector2Int newPos)
-    {
-        if (newPos == gridPos) { return; }
-
-        if (!Dungeon.IsValidMove(newPos)) { return; }
-      
-        if (Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.Player || Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.Enemy || Dungeon.Grid[newPos.x, newPos.y].cellType == CellType.npc)
-        {
-            return;   // block movement if occupied by an enemy or player
-        }
-
-        var cell = Dungeon.Grid[newPos.x, newPos.y];
-
-        if (cell.itemOnCell != null && cell.itemOnCell.TryGetComponent<Item>(out var item))
-        {
-            Debug.Log("Destroy");
-            collectedItem = cell.itemOnCell;
-            collectedItem.gameObject.SetActive(false);
-        }
-       
-        Dungeon.Grid[gridPos.x, gridPos.y].cellType = CellType.Floor;  // clear old tile
-        Dungeon.Grid[gridPos.x, gridPos.y].itemOnCell = null;
-
-        Dungeon.Grid[newPos.x, newPos.y].cellType = CellType.Enemy;   // set new tile
-        Dungeon.Grid[newPos.x, newPos.y].itemOnCell = this.gameObject;
-
-        gridPos = newPos;  // update position
-        transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
-
-    }
-
-    public int GetDistanceFromPlayer()
-    {
-         int distToPlayer = Mathf.Abs(pc.cellX - gridPos.x) + Mathf.Abs(pc.cellY - gridPos.y);
-
-         return distToPlayer;
-    }
-
-    public int sightRange = 9;
-
     public IEnumerator RandomMove()
     {
         Vector2Int[] dirs =
@@ -196,7 +198,6 @@ public class Enemy : MonoBehaviour
 
         yield return null;
     }
-
     public IEnumerator MoveTowardsItem()
     {
         Vector2Int start = gridPos;
@@ -213,6 +214,8 @@ public class Enemy : MonoBehaviour
 
         yield return null;
     }
+    #endregion
+    #region Item Finding
     public Vector2Int FindNearestItem()
     {
         Vector2Int start = gridPos;
@@ -241,7 +244,6 @@ public class Enemy : MonoBehaviour
 
         return bestItem;
     }
-
     List<Vector2Int> FindItemsNearby()
     {
         List<Vector2Int> items = new List<Vector2Int>();
@@ -268,7 +270,8 @@ public class Enemy : MonoBehaviour
 
         return items;
     }
-
+    #endregion
+    #region 
     public IEnumerator Attack()
     {
 

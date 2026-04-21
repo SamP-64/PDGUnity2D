@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void NextFloor(RoomFirstDG dungeonGenerator)
+    public void NextFloor(RoomFirstDG dungeonGenerator) // When the Player moves to the stairs
     {
         dungeonGenerator.GenerateDungeon();
         floor = floor + 1;

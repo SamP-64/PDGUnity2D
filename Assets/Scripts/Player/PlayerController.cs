@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
         playerStats = GetComponent<PlayerStats>();
         playerStats.IntializeStats(1, 20, 8, 8);
     }
-
+    #region Process Input
     void Update()
     {
         CheckHoldingKey();
@@ -107,7 +107,7 @@ public class PlayerController : MonoBehaviour
         }
 
     }
-
+    #endregion 
     #region Input
     void CheckHoldingKey()
     {

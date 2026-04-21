@@ -30,6 +30,7 @@ public class PlayerStats : MonoBehaviour
         UpdateText();  
     }
 
+    #region Health
     private void UpdateText()
     {
         levelText.text = "Lvl. " + level;
@@ -44,36 +45,6 @@ public class PlayerStats : MonoBehaviour
         TakeDamageEffect();
     }
 
-    public void GainExp(int exp)
-    {
-        Debug.Log(exp);
-
-        currentExp += exp;
-
-        while (currentExp >= GetExpToNextLevel(level))
-        {
-            int needed = GetExpToNextLevel(level);
-
-            int overflowExp = currentExp - needed;
-
-            Debug.Log("Level Up");
-
-            level++;
-            currentExp = overflowExp;
-        }
-
-        UpdateText();
-    }
-
-    int GetLevelUpExp(int level)
-    {
-        return level * level * level;
-    }
-    int GetExpToNextLevel(int level)
-    {
-        return GetLevelUpExp(level + 1) - GetLevelUpExp(level);
-    }
-
     public void RestoreHealth(int restoreValue) // Method to increase player health
     {
         currentHP = currentHP + restoreValue;
@@ -85,7 +56,8 @@ public class PlayerStats : MonoBehaviour
 
         UpdateText();
     }
-
+    #endregion
+    #region Damage Effect
     Renderer rend;
     Color originalColor;
     public Color hitColor = Color.red;
@@ -108,4 +80,43 @@ public class PlayerStats : MonoBehaviour
         yield return new WaitForSeconds(flashTime);
         rend.material.color = originalColor;
     }
+    #endregion 
+    #region Exp System
+    public void GainExp(int exp)
+    {
+        Debug.Log(exp);
+
+        currentExp += exp;
+
+        while (currentExp >= GetExpToNextLevel(level))
+        {
+            LevelUp();
+        }
+
+        UpdateText();
+    }
+
+    void LevelUp()
+    {
+        int needed = GetExpToNextLevel(level);
+
+        int overflowExp = currentExp - needed; // Calculate exp left over after level up
+
+        Debug.Log("Level Up");
+
+        level++;
+        currentExp = overflowExp;
+    }
+
+    int GetLevelUpExp(int level) // Total Exp needed for next Level
+    {
+        return level * level * level;
+    }
+    int GetExpToNextLevel(int level) // Exp needed for next Level
+    {
+        return GetLevelUpExp(level + 1) - GetLevelUpExp(level);
+    }
+
+    #endregion
+
 }
