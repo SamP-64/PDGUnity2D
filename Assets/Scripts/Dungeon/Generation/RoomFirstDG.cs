@@ -9,10 +9,12 @@ using Random = UnityEngine.Random;
 public class RoomFirstDG : RandomWalkDungeonGenerator
 {
     [SerializeField]
+    [Range(4, 40)]
     private int minRoomWidth = 4, minRoomHeight = 4;
 
     [SerializeField]
-    public int dungeonWidth = 20, dungeonHeight = 20;
+    [Range(30, 120)]
+    public int dungeonWidth = 30, dungeonHeight = 30;
 
     [SerializeField]
     private bool randomWalkRooms = false;
@@ -47,8 +49,13 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     }
     protected override void RunProceduralGeneration()
     {
-        Dungeon.Initialize(dungeonHeight, dungeonWidth);
+        Dungeon.Initialize(dungeonWidth, dungeonHeight);
         tileMapDisplayer.ClearTileMap();
+        if (TurnManager.Instance != null)
+        {
+            TurnManager.Instance.EndTurn();
+            TurnManager.Instance.ClearEnemies();
+        }
         CreateRooms();
     }
 
@@ -359,6 +366,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             Dungeon.Grid[cell.x, cell.y].cellType = CellType.Enemy;
             Dungeon.Grid[cell.x, cell.y].enemyOnCell = enemyRef;
             Enemy enemyScript = enemyRef.GetComponent<Enemy>();
+            TurnManager.Instance.RegisterEnemy(enemyScript);
             enemyScript.SetStartPosition(new Vector2Int (cell.x, cell.y));
         }
     }
@@ -367,7 +375,8 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         Cell cell = rooms[rooms.Count - 1].GetRandomFloorCell();
         Instantiate(stairs, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
         Dungeon.Grid[cell.x, cell.y].cellType = CellType.Stairs;
-        
+        Dungeon.Grid[cell.x, cell.y].isStairs = true;
+
     }
     public void SpawnMonsterHouse()
     {
@@ -378,6 +387,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             Dungeon.Grid[cell.x, cell.y].cellType = CellType.Enemy;
             Dungeon.Grid[cell.x, cell.y].enemyOnCell = enemyRef;
             Enemy enemyScript = enemyRef.GetComponent<Enemy>();
+            TurnManager.Instance.RegisterEnemy(enemyScript);
             enemyScript.SetStartPosition(new Vector2Int(cell.x, cell.y));
         }
 

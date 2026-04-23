@@ -21,11 +21,11 @@ public class MiniMap : MonoBehaviour
 
     void InitializeMinimap() 
     {
-        minimapTiles = new Image[dg.dungeonWidth, dg.dungeonHeight];
+        minimapTiles = new Image[Dungeon.Grid.GetLength(0), Dungeon.Grid.GetLength(1)];
 
-        for (int x = 0; x < dg.dungeonWidth; x++)
+        for (int x = 0; x < Dungeon.Grid.GetLength(0); x++)
         {
-            for (int y = 0; y < dg.dungeonHeight; y++)
+            for (int y = 0; y < Dungeon.Grid.GetLength(1); y++)
             {
                 GameObject tile = Instantiate(tilePrefab, minimapParent);
                 RectTransform rect = tile.GetComponent<RectTransform>();
@@ -45,13 +45,13 @@ public class MiniMap : MonoBehaviour
 
     public void DrawMinimap() // Method to Draw Minimap on Screen
     {
-        for (int x = 0; x < dg.dungeonWidth ; x++)
+        for (int x = 0; x < Dungeon.Grid.GetLength(0) ; x++)
         {
-            for (int y = 0; y < dg.dungeonHeight; y++)
+            for (int y = 0; y < Dungeon.Grid.GetLength(1); y++)
             {
                 Cell cell = Dungeon.Grid[x, y];
 
-                if (!cell.traversed) // Only Paint Cell if it has been traversed
+                if (cell.traversed) // Only Paint Cell if it has been traversed
                 {
                     minimapTiles[x, y].color = Color.clear;
                     continue;

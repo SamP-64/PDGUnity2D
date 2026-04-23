@@ -155,11 +155,11 @@ public class PlayerController : MonoBehaviour
         if (other.TryGetComponent(out Coin coin))
         {
             DestroyCollidedObject(other);
-            int coinValue = Random.Range(5, 16);
-            textLog.AddMessage("Player Collected " + coinValue  + " Gold!");
-            coins = coins + coinValue;
-            Dungeon.Grid[cellX, cellY].cellType = CellType.Player ;
-            return;
+                int coinValue = Random.Range(5, 16);
+                textLog.AddMessage("Player Collected " + coinValue + " Gold!");
+                coins = coins + coinValue;
+                Dungeon.Grid[cellX, cellY].cellType = CellType.Player;
+                return;
         }
         else if (other.TryGetComponent(out Potion potion))
         {
@@ -169,6 +169,11 @@ public class PlayerController : MonoBehaviour
         }
         else if (other.TryGetComponent(out Stairs stairs))
         {
+            var cell = Dungeon.Grid[cellX, cellY];
+            if (!cell.isStairs)
+            {
+                return;
+            }
             GameManager.Instance.NextFloor(dg);
         }
     }
@@ -227,6 +232,7 @@ public class PlayerController : MonoBehaviour
 
         if (cell.enemyOnCell != null)
         {
+            Debug.Log("EEEEEEEEEEEEEEEEEEEEEEEEE");
             if (cell.enemyOnCell.TryGetComponent<EnemyStats>(out var enemyStats))
             {
                 int damage = DamageCalculator.CalculateDamage(

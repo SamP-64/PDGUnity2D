@@ -35,6 +35,7 @@ public class EnemyStats : MonoBehaviour
         TakeDamageEffect();
         if (currentHP <= 0)
         {
+           // TurnManager.Instance.UnregisterEnemy(enemy);
             dead = true;
             StartCoroutine(DieRoutine());
         }

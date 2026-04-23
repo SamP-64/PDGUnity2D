@@ -10,5 +10,6 @@ public class Cell
     public GameObject itemOnCell;
     public GameObject enemyOnCell;
     public bool walkable = true;
+    public bool isStairs;
    
 }

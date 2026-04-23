@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class TurnManager : MonoBehaviour   
 {
@@ -8,6 +9,8 @@ public class TurnManager : MonoBehaviour
     public static TurnManager Instance;
 
     bool isProcessingTurn = false;
+
+    private List<Enemy> enemies = new List<Enemy>();
 
     private void Awake()
     {
@@ -21,11 +24,11 @@ public class TurnManager : MonoBehaviour
 
         isProcessingTurn = true;
 
-        yield return new WaitForSeconds(waitTime); 
+        yield return new WaitForSeconds(waitTime);
 
-        Enemy[] enemies = FindObjectsOfType<Enemy>();
+        var currentEnemies = enemies.ToArray(); // set copy of enemy list as main list may be midified during the for each loop
 
-        foreach (Enemy enemy in enemies)
+        foreach (Enemy enemy in currentEnemies)
         {
             if (enemy.enemyStats.dead == true)
             {
@@ -66,5 +69,20 @@ public class TurnManager : MonoBehaviour
     public void EndTurn()
     {
         isProcessingTurn = false;
+    }
+
+    public void RegisterEnemy(Enemy enemy)
+    {
+        if (!enemies.Contains(enemy))
+            enemies.Add(enemy);
+    }
+
+    public void UnregisterEnemy(Enemy enemy)
+    {
+        enemies.Remove(enemy);
+    }
+    public void ClearEnemies()
+    {
+        enemies.Clear();
     }
 }

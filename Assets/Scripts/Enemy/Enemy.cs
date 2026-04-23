@@ -140,8 +140,11 @@ public class Enemy : MonoBehaviour
         Dungeon.Grid[gridPos.x, gridPos.y].enemyOnCell = null;
 
         Dungeon.Grid[newPos.x, newPos.y].cellType = CellType.Enemy;   // set new tile
-        Dungeon.Grid[newPos.x, newPos.y].enemyOnCell  = this.gameObject;
-
+      
+        
+        Dungeon.Grid[newPos.x, newPos.y].enemyOnCell = this.gameObject;
+       
+           
         gridPos = newPos;  // update position
         transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
 
@@ -197,12 +200,17 @@ public class Enemy : MonoBehaviour
     public IEnumerator MoveTowardsItem()
     {
         Vector2Int start = gridPos;
+        Vector2Int target = FindNearestItem();
 
-        List<Vector2Int> path = Pathfinder.FindPath(start, FindNearestItem());
+        List<Vector2Int> path = Pathfinder.FindPath(start, target);
 
         if (path == null || path.Count < 2)
         {
-            yield return RandomMove();
+            if (GetDistanceFromPlayer() > sightRange)
+            {
+                yield return RandomMove();
+            }
+
             yield break;
         }
 

@@ -50,6 +50,9 @@ public static class Dungeon
 
                 Grid[x, y].cellType = CellType.Empty;
                 Grid[x, y].traversed = false;
+                Grid[x, y].itemOnCell  = null;
+                Grid[x, y].enemyOnCell = null;
+                Grid[x, y].isStairs = false;
             }
         }
     }
