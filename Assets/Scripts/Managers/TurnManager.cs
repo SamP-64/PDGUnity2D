@@ -9,7 +9,7 @@ public class TurnManager : MonoBehaviour
     public static TurnManager Instance;
 
     bool isProcessingTurn = false;
-    int movementRange; //Distance from player that enables movement
+    int movementRange = 40; //Distance from player that enables movement
     private List<Enemy> enemies = new List<Enemy>();
 
     private void Awake()
@@ -21,6 +21,7 @@ public class TurnManager : MonoBehaviour
     {
         if (isProcessingTurn) { yield break; }
     
+
         isProcessingTurn = true;
 
         yield return new WaitForSeconds(waitTime);
@@ -32,12 +33,17 @@ public class TurnManager : MonoBehaviour
            
             if (enemy.enemyStats.dead == true)
             {
+                Destroy (enemy);
                 continue;
             }
 
-            if (enemy.GetDistanceFromPlayer() > movementRange) // ignore enemies too far away
+            if (enemy.GetDistanceFromPlayer() > movementRange) // ignore enemies too far
             {
-                 continue;
+                continue;
+            }
+            else if (enemy.CanSpit(4) && enemy.enemyType == EnemyType.Snake) 
+            {
+                yield return enemy.SpitAttack();
             }
             else if (enemy.IsNextToPlayer())
             {

@@ -95,3 +95,8 @@ public enum CellType
     Potion,
     npc
 }
+public enum EnemyType
+{
+    Bat,
+    Snake
+}

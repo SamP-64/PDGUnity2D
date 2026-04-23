@@ -33,7 +33,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     private GameObject potion;
 
     [SerializeField]
-    private GameObject enemy;
+    private GameObject[] enemy;
 
     [SerializeField]
     private GameObject coin;
@@ -357,19 +357,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             Dungeon.Grid[cell.x, cell.y].itemOnCell = coinRef;
         }
     }
-    private void SpawnEnemies()
-    {
-        for (int i = 0; i < rooms.Count; i++)
-        {
-            Cell cell = rooms[i].GetRandomFloorCell();
-            GameObject enemyRef = Instantiate(enemy, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
-            Dungeon.Grid[cell.x, cell.y].cellType = CellType.Enemy;
-            Dungeon.Grid[cell.x, cell.y].enemyOnCell = enemyRef;
-            Enemy enemyScript = enemyRef.GetComponent<Enemy>();
-            TurnManager.Instance.RegisterEnemy(enemyScript);
-            enemyScript.SetStartPosition(new Vector2Int (cell.x, cell.y));
-        }
-    }
+   
     private void SpawnStairs()
     {
         Cell cell = rooms[rooms.Count - 1].GetRandomFloorCell();
@@ -378,20 +366,41 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         Dungeon.Grid[cell.x, cell.y].isStairs = true;
 
     }
+
+    private void SpawnEnemies()
+    {
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            Cell cell = rooms[i].GetRandomFloorCell();
+            int index = Random.Range(0, 2); 
+            GameObject enemyToSpawn = enemy[index];
+            SpawnEnemyAtCell(enemyToSpawn, cell);
+        }
+    }
     public void SpawnMonsterHouse()
     {
         for (int i = 0; i < 10; i++)
         {
             Cell cell = rooms[monsterRoom - 1].GetRandomFloorCell();
-            GameObject enemyRef = Instantiate(enemy, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
-            Dungeon.Grid[cell.x, cell.y].cellType = CellType.Enemy;
-            Dungeon.Grid[cell.x, cell.y].enemyOnCell = enemyRef;
-            Enemy enemyScript = enemyRef.GetComponent<Enemy>();
-            TurnManager.Instance.RegisterEnemy(enemyScript);
-            enemyScript.SetStartPosition(new Vector2Int(cell.x, cell.y));
+            int index = Random.Range(0, 2); 
+            GameObject enemyToSpawn = enemy[index];
+            SpawnEnemyAtCell(enemyToSpawn,cell);
         }
 
-        monsterRoom = -1;  // cannot be spawned until next floor;
+        monsterRoom = -1;
+    }
+
+    void SpawnEnemyAtCell(GameObject chosenEnemy, Cell cell)
+    {
+        GameObject enemyRef = Instantiate(chosenEnemy, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+
+        Dungeon.Grid[cell.x, cell.y].cellType = CellType.Enemy;
+        Dungeon.Grid[cell.x, cell.y].enemyOnCell = enemyRef;
+
+        Enemy enemyScript = enemyRef.GetComponent<Enemy>();
+        TurnManager.Instance.RegisterEnemy(enemyScript);
+
+        enemyScript.SetStartPosition(new Vector2Int(cell.x, cell.y));
     }
     #endregion
 }

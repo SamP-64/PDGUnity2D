@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -15,6 +16,7 @@ public class Enemy : MonoBehaviour
     TextLog textLog;
     public EnemyStats enemyStats;
     public int sightRange = 9;
+    public EnemyType enemyType;
 
     public void SetPosition(Vector2Int pos)
     {
@@ -44,67 +46,148 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    Vector2Int GetBestAdjacentToPlayer()
+    public IEnumerator SpitAttack()
     {
-        Vector2Int playerPos = new Vector2Int(pc.cellX, pc.cellY);
+        textLog.AddMessage("Snake spits!");
 
-        Vector2Int[] cardinalDirs =
+        Vector2Int dir = Vector2Int.zero;
+
+        int dx = pc.cellX - gridPos.x;
+        int dy = pc.cellY - gridPos.y;
+
+        if (gridPos.y == pc.cellY)
         {
-        Vector2Int.up,
-        Vector2Int.left,
-        Vector2Int.right,
-        Vector2Int.down
-    };
-
-        Vector2Int[] diagonalDirs =
-        {
-        new Vector2Int(-1, 1),
-        new Vector2Int(1, 1),
-        new Vector2Int(-1, -1),
-        new Vector2Int(1, -1)
-    };
-
-        // -------- FIRST PASS: CARDINAL --------
-        Vector2Int best = gridPos;
-        int bestDist = int.MaxValue;
-        bool found = false;
-
-        foreach (var dir in cardinalDirs)
-        {
-            Vector2Int test = playerPos + dir;
-
-            if (!Dungeon.IsValidMove(test)) continue;
-
-            int dist = Mathf.Abs(test.x - gridPos.x) + Mathf.Abs(test.y - gridPos.y);
-
-            if (dist < bestDist)
+            if (dx > 0)
             {
-                bestDist = dist;
-                best = test;
-                found = true;
+                dir = Vector2Int.right;
+            }
+            else
+            {
+                dir = Vector2Int.left;
+            }
+        }
+        else if (gridPos.x == pc.cellX)
+        {
+            if (dy > 0)
+            {
+                dir = Vector2Int.up;
+            }
+            else
+            {
+                dir = Vector2Int.down;
             }
         }
 
-        if (found)
-            return best;
+        Vector2Int pos = gridPos;
 
-        // -------- SECOND PASS: DIAGONALS --------
-        foreach (var dir in diagonalDirs)
+        for (int i = 1; i <= 6; i++)
         {
-            Vector2Int test = playerPos + dir;
+            pos += dir;
 
-            if (!Dungeon.IsValidMove(test)) continue;
-
-            int dist = Mathf.Abs(test.x - gridPos.x) + Mathf.Abs(test.y - gridPos.y);
-
-            if (dist < bestDist)
+            if (pos.x < 0 || pos.y < 0 ||
+                pos.x >= Dungeon.Grid.GetLength(0) ||
+                pos.y >= Dungeon.Grid.GetLength(1))
             {
-                bestDist = dist;
-                best = test;
+                break;
             }
+
+            SpawnSpitFX(pos);
+
+            var cell = Dungeon.Grid[pos.x, pos.y];
+
+            if (pos.x == pc.cellX && pos.y == pc.cellY)
+            {
+                int damage = DamageCalculator.CalculateDamage(
+                    enemyStats.level,
+                    enemyStats.attack,
+                    30,
+                    ps.defence
+                );
+
+                ps.ApplyDamage(damage);
+                break;
+            }
+
+            if (cell.cellType == CellType.Wall)
+            {
+                break;
+            }
+
+            yield return new WaitForSeconds(0.15f);
         }
-        
-        return best;
+
+        yield return new WaitForSeconds(0.4f);
+    }
+    void SpawnSpitFX(Vector2Int pos)
+    {
+        Vector3 worldPos = new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0f);
+
+        GameObject fx = Instantiate( pc.snakeHitFX, worldPos, Quaternion.identity);
+
+        Destroy(fx, 0.15f);
+    }
+    public bool CanSpit(int range)
+    {
+        int dx = pc.cellX - gridPos.x;
+        int dy = pc.cellY - gridPos.y;
+
+        // same row
+        if (gridPos.y == pc.cellY)
+        {
+            int dist = Mathf.Abs(dx);
+
+            if (dist > range || dist == 0)
+                return false;
+
+            int stepX;
+
+            if (dx > 0)
+            {
+                stepX = 1;
+            }
+            else
+            {
+                stepX = -1;
+            }
+
+            for (int x = gridPos.x + stepX; x != pc.cellX; x += stepX)
+            {
+                if (!Dungeon.IsValidMove(new Vector2Int(x, gridPos.y)))
+                    return false;
+            }
+
+            return true;
+        }
+
+        // same column
+        if (gridPos.x == pc.cellX)
+        {
+            int dist = Mathf.Abs(dy);
+
+            if (dist > range || dist == 0)
+                return false;
+
+            int stepY;
+
+            if (dy > 0)
+            {
+                stepY = 1;
+            }
+            else
+            {
+                stepY = -1;
+            }
+
+            for (int y = gridPos.y + stepY; y != pc.cellY; y += stepY)
+            {
+                if (!Dungeon.IsValidMove(new Vector2Int(gridPos.x, y)))
+                    return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public int GetDistanceFromPlayer()
@@ -152,7 +235,8 @@ public class Enemy : MonoBehaviour
     public IEnumerator MoveTowardsPlayer()
     {
         Vector2Int start = gridPos;
-        Vector2Int goal = GetBestAdjacentToPlayer();
+        //  Vector2Int goal = GetBestAdjacentToPlayer();
+        Vector2Int goal = new Vector2Int(pc.cellX, pc.cellY);
 
         List<Vector2Int> path = Pathfinder.FindPath(start, goal);
 
@@ -168,7 +252,7 @@ public class Enemy : MonoBehaviour
     }
     public IEnumerator RandomMove()
     {
-        Vector2Int[] dirs =
+        Vector2Int[] directions =
         {
         Vector2Int.up,
         Vector2Int.down,
@@ -176,15 +260,17 @@ public class Enemy : MonoBehaviour
         Vector2Int.right
     };
 
-        for (int i = 0; i < dirs.Length; i++)
+        directions = directions.OrderBy(x => Random.value).ToArray(); // Randomize so direction doesnt have priority if equal
+
+        for (int i = 0; i < directions.Length; i++)
         {
-            Vector2Int temp = dirs[i];
-            int r = Random.Range(i, dirs.Length);
-            dirs[i] = dirs[r];
-            dirs[r] = temp;
+            Vector2Int temp = directions[i];
+            int r = Random.Range(i, directions.Length);
+            directions[i] = directions[r];
+            directions[r] = temp;
         }
 
-        foreach (var dir in dirs)
+        foreach (var dir in directions)
         {
             Vector2Int newPos = gridPos + dir;
 

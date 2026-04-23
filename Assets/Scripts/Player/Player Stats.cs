@@ -104,7 +104,12 @@ public class PlayerStats : MonoBehaviour
 
         Debug.Log("Level Up");
 
+        maxHP = maxHP + 3;
+        currentHP = currentHP + 3;
+        attack = attack + 2;
+        defence = defence + 2;
         level++;
+
         currentExp = overflowExp;
     }
 

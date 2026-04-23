@@ -51,7 +51,7 @@ public class MiniMap : MonoBehaviour
             {
                 Cell cell = Dungeon.Grid[x, y];
 
-                if (cell.traversed) // Only Paint Cell if it has been traversed
+                if (!cell.traversed) // Only Paint Cell if it has been traversed
                 {
                     minimapTiles[x, y].color = Color.clear;
                     continue;

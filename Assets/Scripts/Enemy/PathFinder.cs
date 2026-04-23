@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class Pathfinder
 {
-    static Vector2Int[] dirs =
+    static Vector2Int[] directions =
     {
         Vector2Int.up,
         Vector2Int.down,
@@ -44,7 +45,10 @@ public static class Pathfinder
             open.Remove(current);
             closed.Add(current.pos);
 
-            foreach (var dir in dirs)
+            var shuffledDirs = directions.OrderBy(d => Random.value).ToArray(); //shuffle to prevent priority
+
+           
+            foreach (var dir in shuffledDirs)
             {
                 Vector2Int nextPos = current.pos + dir;
 

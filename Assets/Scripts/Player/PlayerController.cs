@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         playerStats = GetComponent<PlayerStats>();
-        playerStats.IntializeStats(1, 20, 8, 8);
+        playerStats.IntializeStats(1, 30, 8, 8);
     }
     #region Process Input
     void Update()
@@ -260,6 +260,7 @@ public class PlayerController : MonoBehaviour
     #region Range Attack
 
     [SerializeField] GameObject rangedHitFX;
+    [SerializeField] public GameObject snakeHitFX;
 
     void RangedAttack(Vector2Int dir)
     {
