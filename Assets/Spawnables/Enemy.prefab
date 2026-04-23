@@ -104,7 +104,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridPos: {x: 0, y: 0}
   collectedItem: {fileID: 0}
+  player: {fileID: 0}
+  pc: {fileID: 0}
+  ps: {fileID: 0}
+  enemyStats: {fileID: 0}
   sightRange: 9
+  enemyType: 0
+  rangedAttackRange: 6
+  rangedPower: 30
+  meleePower: 50
 --- !u!114 &2054206210335293821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,5 +147,3 @@ MonoBehaviour:
   attack: 3
   defence: 4
   dead: 0
-  hitColor: {r: 1, g: 0, b: 0, a: 1}
-  flashTime: 0.1

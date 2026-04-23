@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public TMP_Text floorText;
+    [SerializeField] public TextLog textLog;
 
     private int floor = 1;
 
@@ -21,6 +22,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
     }
 
     public void NextFloor(RoomFirstDG dungeonGenerator) // When the Player moves to the stairs

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 //using static UnityEditor.Progress;
@@ -10,13 +9,16 @@ public class Enemy : MonoBehaviour
 {
     public Vector2Int gridPos;
     public GameObject collectedItem;
-
-    public PlayerController pc;
-    PlayerStats ps;
-    TextLog textLog;
-    public EnemyStats enemyStats;
-    public int sightRange = 9;
     public EnemyType enemyType;
+
+    [HideInInspector] public PlayerController pc;
+    [HideInInspector] public PlayerStats ps;
+    [HideInInspector] public EnemyStats enemyStats;
+    
+    [SerializeField] public int sightRange = 9;
+    [SerializeField] int rangedAttackRange = 6;
+    [SerializeField] int rangedPower = 30;
+    [SerializeField] int meleePower = 50;
 
     public void SetPosition(Vector2Int pos)
     {
@@ -24,13 +26,12 @@ public class Enemy : MonoBehaviour
         transform.position = new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0f);
     }
 
-    public void SetStartPosition(Vector2Int pos)
+    public void SetStartPosition(Vector2Int pos) // Initialise enemy 
     {
         enemyStats = GetComponent<EnemyStats>();
         gridPos = pos;
-        pc = FindObjectOfType<PlayerController>();
-        ps = FindObjectOfType<PlayerStats>();
-        textLog = FindObjectOfType<TextLog>();
+        pc = FindFirstObjectByType<PlayerController>();
+        ps = FindFirstObjectByType<PlayerStats>();
     }
 
     #region Find Player
@@ -46,11 +47,11 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public IEnumerator SpitAttack()
+    public IEnumerator RangedAttack() // Snake ranged attack
     {
-        textLog.AddMessage("Snake spits!");
+        GameManager.Instance.textLog.AddMessage("Enemy Snake Shoots!");
 
-        Vector2Int dir = Vector2Int.zero;
+        Vector2Int direction = Vector2Int.zero;
 
         int dx = pc.cellX - gridPos.x;
         int dy = pc.cellY - gridPos.y;
@@ -59,48 +60,46 @@ public class Enemy : MonoBehaviour
         {
             if (dx > 0)
             {
-                dir = Vector2Int.right;
+                direction = Vector2Int.right;
             }
             else
             {
-                dir = Vector2Int.left;
+                direction = Vector2Int.left;
             }
         }
         else if (gridPos.x == pc.cellX)
         {
             if (dy > 0)
             {
-                dir = Vector2Int.up;
+                direction = Vector2Int.up;
             }
             else
             {
-                dir = Vector2Int.down;
+                direction = Vector2Int.down;
             }
         }
 
-        Vector2Int pos = gridPos;
+        Vector2Int position = gridPos;
 
-        for (int i = 1; i <= 6; i++)
+        for (int i = 1; i <= rangedAttackRange; i++)
         {
-            pos += dir;
+            position += direction;
 
-            if (pos.x < 0 || pos.y < 0 ||
-                pos.x >= Dungeon.Grid.GetLength(0) ||
-                pos.y >= Dungeon.Grid.GetLength(1))
+            if (!Dungeon.IsInsideGrid(position))
             {
                 break;
             }
 
-            SpawnSpitFX(pos);
+            SpawnShootFX(position);
 
-            var cell = Dungeon.Grid[pos.x, pos.y];
+            var cell = Dungeon.Grid[position.x, position.y];
 
-            if (pos.x == pc.cellX && pos.y == pc.cellY)
+            if (position.x == pc.cellX && position.y == pc.cellY)
             {
                 int damage = DamageCalculator.CalculateDamage(
                     enemyStats.level,
                     enemyStats.attack,
-                    30,
+                    rangedPower,
                     ps.defence
                 );
 
@@ -118,7 +117,7 @@ public class Enemy : MonoBehaviour
 
         yield return new WaitForSeconds(0.4f);
     }
-    void SpawnSpitFX(Vector2Int pos)
+    void SpawnShootFX(Vector2Int pos) // Spawns projectiles
     {
         Vector3 worldPos = new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0f);
 
@@ -126,13 +125,12 @@ public class Enemy : MonoBehaviour
 
         Destroy(fx, 0.15f);
     }
-    public bool CanSpit(int range)
+    public bool CanShoot(int range) // Checks if the player is in range and in line
     {
         int dx = pc.cellX - gridPos.x;
         int dy = pc.cellY - gridPos.y;
 
-        // same row
-        if (gridPos.y == pc.cellY)
+        if (gridPos.y == pc.cellY)  // same row
         {
             int dist = Mathf.Abs(dx);
 
@@ -159,8 +157,7 @@ public class Enemy : MonoBehaviour
             return true;
         }
 
-        // same column
-        if (gridPos.x == pc.cellX)
+        if (gridPos.x == pc.cellX)   // same column
         {
             int dist = Mathf.Abs(dy);
 
@@ -190,7 +187,7 @@ public class Enemy : MonoBehaviour
         return false;
     }
 
-    public int GetDistanceFromPlayer()
+    public int GetDistanceFromPlayer() // Returns the distance from enemy to player
     {
          int distToPlayer = Mathf.Abs(pc.cellX - gridPos.x) + Mathf.Abs(pc.cellY - gridPos.y);
 
@@ -198,7 +195,7 @@ public class Enemy : MonoBehaviour
     }
     #endregion 
     #region Enemy Movement
-    void MoveTo(Vector2Int newPos)
+    void MoveTo(Vector2Int newPos) // Method that moves the enemy 1 tile
     {
         if (newPos == gridPos) { return; }
 
@@ -223,16 +220,13 @@ public class Enemy : MonoBehaviour
         Dungeon.Grid[gridPos.x, gridPos.y].enemyOnCell = null;
 
         Dungeon.Grid[newPos.x, newPos.y].cellType = CellType.Enemy;   // set new tile
-      
-        
         Dungeon.Grid[newPos.x, newPos.y].enemyOnCell = this.gameObject;
        
-           
         gridPos = newPos;  // update position
         transform.position = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0f);
 
     }
-    public IEnumerator MoveTowardsPlayer()
+    public IEnumerator MoveTowardsPlayer() // Enemy moves toward player
     {
         Vector2Int start = gridPos;
         //  Vector2Int goal = GetBestAdjacentToPlayer();
@@ -250,7 +244,7 @@ public class Enemy : MonoBehaviour
 
         yield return null;
     }
-    public IEnumerator RandomMove()
+    public IEnumerator RandomMove() // Enemy moves randomly if nothing nearby
     {
         Vector2Int[] directions =
         {
@@ -260,9 +254,7 @@ public class Enemy : MonoBehaviour
         Vector2Int.right
     };
 
-        directions = directions.OrderBy(x => Random.value).ToArray(); // Randomize so direction doesnt have priority if equal
-
-        for (int i = 0; i < directions.Length; i++)
+        for (int i = 0; i < directions.Length; i++) // Shuffle Directions
         {
             Vector2Int temp = directions[i];
             int r = Random.Range(i, directions.Length);
@@ -274,8 +266,7 @@ public class Enemy : MonoBehaviour
         {
             Vector2Int newPos = gridPos + dir;
 
-            if (!Dungeon.IsValidMove(newPos))
-                continue;
+            if (!Dungeon.IsValidMove(newPos)) { continue; }
 
             MoveTo(newPos);
             break;
@@ -283,7 +274,7 @@ public class Enemy : MonoBehaviour
 
         yield return null;
     }
-    public IEnumerator MoveTowardsItem()
+    public IEnumerator MoveTowardsItem() // Methood that moves the enemy towards the nearest item
     {
         Vector2Int start = gridPos;
         Vector2Int target = FindNearestItem();
@@ -306,7 +297,7 @@ public class Enemy : MonoBehaviour
     }
     #endregion
     #region Item Finding
-    public Vector2Int FindNearestItem()
+    public Vector2Int FindNearestItem() // Finds the nearest item for the enemy to pick up
     {
         Vector2Int start = gridPos;
 
@@ -334,7 +325,7 @@ public class Enemy : MonoBehaviour
 
         return bestItem;
     }
-    List<Vector2Int> FindItemsNearby()
+    List<Vector2Int> FindItemsNearby() // Searches the grid around the enemy to find the nearest item
     {
         List<Vector2Int> items = new List<Vector2Int>();
 
@@ -361,29 +352,25 @@ public class Enemy : MonoBehaviour
         return items;
     }
     #endregion
-    #region Atatck
+    #region Attack
     public IEnumerator Attack()
     {
-
         Vector3 originalPos = transform.position;
         Vector3 targetPos = new Vector3(pc.cellX + 0.5f, pc.cellY + 0.5f, 0f);
 
-        // move halfway toward player
-        transform.position = Vector3.Lerp(originalPos, targetPos, 0.3f);
+        transform.position = Vector3.Lerp(originalPos, targetPos, 0.3f);  // move halfway toward player
 
         yield return new WaitForSeconds(0.05f);
 
-        int damage = DamageCalculator.CalculateDamage(enemyStats.level, enemyStats.attack, 50, ps.level);
+        int damage = DamageCalculator.CalculateDamage(enemyStats.level, enemyStats.attack, meleePower, ps.level); // Use the formula to calculate damage
 
-        ps.ApplyDamage(damage);
-        enemyStats.currentHP -= damage;
+        ps.ApplyDamage(damage); // apply damage to the player
 
-        textLog.AddMessage("Player took " + damage + " damage!");
+        GameManager.Instance.textLog.AddMessage("Player took " + damage + " damage!");
 
         yield return new WaitForSeconds(0.5f);
 
-        // move back
-        transform.position = originalPos;
+        transform.position = originalPos; // move back
 
         yield return new WaitForSeconds(0.05f);
     }

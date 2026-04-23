@@ -19,8 +19,7 @@ public class TurnManager : MonoBehaviour
 
     public IEnumerator NextTurn(float waitTime)
     {
-        if (isProcessingTurn) { yield break; }
-    
+        if (isProcessingTurn) { yield break; }  // Prevent double turns
 
         isProcessingTurn = true;
 
@@ -30,7 +29,8 @@ public class TurnManager : MonoBehaviour
 
         foreach (Enemy enemy in currentEnemies)
         {
-           
+            if (enemy == null) { continue; } // if deestroyed mid loop
+
             if (enemy.enemyStats.dead == true)
             {
                 Destroy (enemy);
@@ -41,9 +41,9 @@ public class TurnManager : MonoBehaviour
             {
                 continue;
             }
-            else if (enemy.CanSpit(4) && enemy.enemyType == EnemyType.Snake) 
+            else if (enemy.CanShoot(4) && enemy.enemyType == EnemyType.Snake) 
             {
-                yield return enemy.SpitAttack();
+                yield return enemy.RangedAttack();
             }
             else if (enemy.IsNextToPlayer())
             {
