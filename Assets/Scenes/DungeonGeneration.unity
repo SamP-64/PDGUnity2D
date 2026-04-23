@@ -38741,10 +38741,10 @@ MonoBehaviour:
   tileMapDisplayer: {fileID: 172064601}
   startPosition: {x: 0, y: 0}
   randomWalkParameters: {fileID: 11400000, guid: e9adfdf90709bde4cbd062054c58a44f, type: 2}
-  minRoomWidth: 40
-  minRoomHeight: 40
-  dungeonWidth: 100
-  dungeonHeight: 100
+  minRoomWidth: 10
+  minRoomHeight: 10
+  dungeonWidth: 120
+  dungeonHeight: 120
   randomWalkRooms: 1
   roomOffset: 2
   player: {fileID: 2002937525}
@@ -38943,7 +38943,7 @@ MonoBehaviour:
   minimapParent: {fileID: 860460607}
   tileSize: 8
   dg: {fileID: 986286115}
-  offset: {x: -850, y: -400}
+  offset: {x: -900, y: -500}
 --- !u!4 &1124234164
 Transform:
   m_ObjectHideFlags: 0

@@ -9,7 +9,7 @@ public class TurnManager : MonoBehaviour
     public static TurnManager Instance;
 
     bool isProcessingTurn = false;
-
+    int movementRange; //Distance from player that enables movement
     private List<Enemy> enemies = new List<Enemy>();
 
     private void Awake()
@@ -21,7 +21,6 @@ public class TurnManager : MonoBehaviour
     {
         if (isProcessingTurn) { yield break; }
     
-
         isProcessingTurn = true;
 
         yield return new WaitForSeconds(waitTime);
@@ -30,12 +29,17 @@ public class TurnManager : MonoBehaviour
 
         foreach (Enemy enemy in currentEnemies)
         {
+           
             if (enemy.enemyStats.dead == true)
             {
                 continue;
             }
 
-            if (enemy.IsNextToPlayer())
+            if (enemy.GetDistanceFromPlayer() > movementRange) // ignore enemies too far away
+            {
+                 continue;
+            }
+            else if (enemy.IsNextToPlayer())
             {
                 yield return enemy.Attack();
             }
