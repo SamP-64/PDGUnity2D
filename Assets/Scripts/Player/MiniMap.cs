@@ -8,8 +8,6 @@ public class MiniMap : MonoBehaviour
     [SerializeField] private RectTransform minimapParent;
     [SerializeField] private float tileSize = 6f;
 
-    [SerializeField] private RoomFirstDG dg; // Generator reference
-
     [SerializeField] private Vector2 offset; // Position offset on screen
 
     private void Start()
@@ -31,10 +29,7 @@ public class MiniMap : MonoBehaviour
                 RectTransform rect = tile.GetComponent<RectTransform>();
                 Image image = tile.GetComponent<Image>();
 
-                rect.anchoredPosition = new Vector2(
-                    x * tileSize + offset.x,
-                    y * tileSize + offset.y
-                );
+                rect.anchoredPosition = new Vector2( x * tileSize + offset.x, y * tileSize + offset.y );  // Position tiles in grid layout
 
                 rect.sizeDelta = new Vector2(tileSize, tileSize);
 
@@ -50,44 +45,32 @@ public class MiniMap : MonoBehaviour
             for (int y = 0; y < Dungeon.Grid.GetLength(1); y++)
             {
                 Cell cell = Dungeon.Grid[x, y];
+                Image tile = minimapTiles[x, y];
 
-                if (!cell.traversed) // Only Paint Cell if it has been traversed
+                if (!cell.traversed)    // Hide unexplored tiles
                 {
-                    minimapTiles[x, y].color = Color.clear;
+                    tile.color = Color.clear;
                     continue;
                 }
 
-                switch (cell.cellType) // Paint Minimap depending on what each cell contains
-                {
-                    case CellType.Wall:
-                        minimapTiles[x, y].color = Color.gray;
-                        break;
-                    case CellType.Player:
-                        minimapTiles[x, y].color = Color.white;
-                        break;
-                    case CellType.Coin:
-                        minimapTiles[x, y].color = Color.yellow;
-                        break;
-                    case CellType.Stairs:
-                        minimapTiles[x, y].color = Color.blue;
-                        break;
-                    case CellType.Potion:
-                        minimapTiles[x, y].color = Color.green;
-                        break;
-                    case CellType.npc:
-                        minimapTiles[x, y].color = Color.cyan;
-                        break;
-                    case CellType.Empty:
-                        minimapTiles[x, y].color = Color.clear;
-                        break;
-                    case CellType.Enemy:
-                        minimapTiles[x, y].color = Color.red;
-                        break;
-                    default:
-                        minimapTiles[x, y].color = Color.clear;
-                        break;
-                }
+                tile.color = GetColor(cell.cellType);  // Assign colour based on cell type
             }
+        }
+    }
+
+    Color GetColor(CellType type) // Paints the map based on cell type
+    {
+        switch (type)
+        {
+            case CellType.Wall: return Color.gray;
+            case CellType.Player: return Color.white;
+            case CellType.Coin: return Color.yellow;
+            case CellType.Stairs: return Color.blue;
+            case CellType.Potion: return Color.green;
+            case CellType.npc: return Color.cyan;
+            case CellType.Enemy: return Color.red;
+            case CellType.Empty: return Color.clear;
+            default: return Color.clear;
         }
     }
 }

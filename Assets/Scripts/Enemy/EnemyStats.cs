@@ -10,20 +10,24 @@ public class EnemyStats : MonoBehaviour
     public int defence;
     public bool dead = false;
 
+    [SerializeField] int expYield = 20;
+
     Enemy enemy;
 
     public void IntializeStats(int level, int hp, int atk, int def)
     {
-       
-        this.maxHP = hp;
-        this.currentHP = hp;
-        this.attack = atk;
-        this.defence = def;
+        int floor = GameManager.Instance.floor;
+        this.level = level + floor;
+        this.maxHP = hp + ( 3 * floor);
+        this.currentHP = hp + (3 * floor) ;
+        this.attack = atk * floor;
+        this.defence = def * floor;
     }
 
     private void Start()
     {
         enemy = gameObject.GetComponent<Enemy>();
+       
     }
 
     #region TakeDamage
@@ -33,12 +37,15 @@ public class EnemyStats : MonoBehaviour
         currentHP = currentHP - damage;
 
         GameManager.Instance.textLog.AddMessage("Enemy took " + damage + " damage!");
-        TakeDamageEffect();
-
+       
         if (currentHP <= 0 && !dead)
         {
             dead = true;
             yield return StartCoroutine(DieRoutine());
+        }
+        else
+        {
+            TakeDamageEffect();
         }
     }
 
@@ -47,14 +54,18 @@ public class EnemyStats : MonoBehaviour
     IEnumerator DieRoutine()
     {
 
+        PlayerController pc = enemy.pc;
+
         Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType = CellType.Floor;
-        yield return StartCoroutine(DieEffect());
+        Vector3 targetPos = new Vector3(pc.cellX + 0.5f, pc.cellY + 0.5f);
+
+        pc.transform.position = targetPos ;
+
+        yield return StartCoroutine(DieEffect()); // Play death animation before continuing
 
         if (enemy.collectedItem != null)
         {
-            
-            Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType =
-            enemy.collectedItem.GetComponent<Spawnable>().CellType;
+            Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType = enemy.collectedItem.GetComponent<Spawnable>().CellType;
 
             enemy.collectedItem.transform.position = transform.position;
             enemy.collectedItem.SetActive(true);
@@ -62,8 +73,8 @@ public class EnemyStats : MonoBehaviour
 
         Destroy(gameObject);
         GameManager.Instance.textLog.AddMessage("Enemy Defeated!");
-        int exp = ExpCalculator.CalculateXPFast(level);
-        enemy.pc.playerStats.GainExp(exp);
+        int exp = ExpCalculator.CalculateEXP(level, pc.playerStats.level, expYield);
+        pc.playerStats.GainExp(exp);
     }
 
     Renderer rend;
@@ -79,17 +90,17 @@ public class EnemyStats : MonoBehaviour
     }
     public void TakeDamageEffect()
     {
-        StopAllCoroutines();
+        StopCoroutine(nameof(Flash)); // Prevent flashing overlap
         StartCoroutine(Flash());
     }
-    IEnumerator Flash()
+    IEnumerator Flash() // Flash Damage Effect
     {
         rend.material.color = hitColour;
         yield return new WaitForSeconds(flashTime);
         rend.material.color = originalColour;
     }
 
-    public IEnumerator DieEffect()
+    public IEnumerator DieEffect() // Death animation - Shrink 
     {
         Transform t = transform;
         Renderer rend = GetComponentInChildren<Renderer>();

@@ -212,9 +212,7 @@ public class PlayerController : MonoBehaviour
 
         transform.position = Vector3.Lerp(originalPos, targetPos, 0.3f); // Move towards enemy
 
-        yield return new WaitForSeconds(0.3f);  // Stay in attack position
-
-        transform.position = originalPos;
+        yield return new WaitForSeconds(0.1f);  // Stay in attack position
 
         if (cell.enemyOnCell != null)
         {
@@ -230,10 +228,12 @@ public class PlayerController : MonoBehaviour
 
                 yield return StartCoroutine(enemyStats.ApplyDamage(damage));
 
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(0.1f);
 
             }
         }
+
+        transform.position = originalPos;
 
         yield return new WaitForSeconds(0.05f);
 

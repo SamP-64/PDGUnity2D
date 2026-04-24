@@ -10,19 +10,17 @@ public class TileMapDisplayer : MonoBehaviour
     [SerializeField] private TileBase WallTile;
 
     [SerializeField]
-    private TileBase wallTop, wallSideRight, wallSideLeft, wallBottom, wallFull,
+    private TileBase wallTop, wallSideRight, wallSideLeft, wallBottom, wallFull,   // Wall variants based on neighbours
     wallInnerCornerDownLeft, wallInnerCornerDownRight, wallDiagonalCornerDownRight, 
     wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft;
 
-    [SerializeField] private GameObject coin;
-    [SerializeField] private GameObject enemy;
-
+    #region Paint Tiles
     public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions)
     {
         PaintFloorTiles(floorPositions, floorTileMap, floorTile);
     }
 
-    private void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Tilemap floorTileMap, TileBase floorTile)
+    private void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Tilemap floorTileMap, TileBase floorTile) // paints all floors in floorpositions
     {
         foreach (var position in floorPositions) 
         {
@@ -31,25 +29,14 @@ public class TileMapDisplayer : MonoBehaviour
         } 
     }
 
-    private void PaintSingleTile(Tilemap floorTileMap, TileBase floorTile, Vector2Int position)
+    private void PaintSingleTile(Tilemap floorTileMap, TileBase floorTile, Vector2Int position) // Paints a custom tile
     {
         var tilePosition = floorTileMap.WorldToCell((Vector3Int) position);
         floorTileMap.SetTile(tilePosition, floorTile);
     }
 
-    public void ClearTileMap()
-    {
-        floorTileMap.ClearAllTiles();
-        wallTileMap.ClearAllTiles();
-
-        Spawnable[] spawnables = FindObjectsOfType<Spawnable>();
-
-        foreach (Spawnable item in spawnables)
-        {
-            Destroy(item.gameObject);
-        }
-    }
-
+    #endregion 
+    #region Walls
     internal void PaintBasicWall(Vector2Int position, string neighboursValue)
     {
         int valueToInt = Convert.ToInt32(neighboursValue, 2); // convert the binary value to int
@@ -128,4 +115,23 @@ public class TileMapDisplayer : MonoBehaviour
             Dungeon.Grid[position.x, position.y].cellType = CellType.Wall;
         }
     }
+    #endregion
+    #region Dungeon Reset
+    public void ClearTileMap()
+    {
+        floorTileMap.ClearAllTiles();
+        wallTileMap.ClearAllTiles();
+        DestroySpawnables();
+    }
+
+    private void DestroySpawnables() // Destroys all spawned gameobjects
+    {
+
+        Spawnable[] spawnables = FindObjectsByType<Spawnable>(FindObjectsSortMode.None);
+        foreach (Spawnable item in spawnables)
+        {
+            Destroy(item.gameObject);
+        }
+    }
+    #endregion
 }

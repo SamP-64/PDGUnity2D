@@ -41,6 +41,8 @@ public class PlayerStats : MonoBehaviour
     {
 
         currentHP = currentHP - damage;
+        currentHP = Mathf.Max(currentHP, 0);
+
         UpdateText();
         TakeDamageEffect();
     }
@@ -84,8 +86,7 @@ public class PlayerStats : MonoBehaviour
     #region Exp System
     public void GainExp(int exp)
     {
-        Debug.Log(exp);
-
+        GameManager.Instance.textLog.AddMessage("Player gained " + exp + " EXP!");
         currentExp += exp;
 
         while (currentExp >= GetExpToNextLevel(level))
@@ -102,24 +103,24 @@ public class PlayerStats : MonoBehaviour
 
         int overflowExp = currentExp - needed; // Calculate exp left over after level up
 
-        Debug.Log("Level Up");
-
         maxHP = maxHP + 3;
         currentHP = currentHP + 3;
         attack = attack + 2;
         defence = defence + 2;
         level++;
 
+        GameManager.Instance.textLog.AddMessage("Player grew to Lv." + level + "!");
+
         currentExp = overflowExp;
     }
 
-    int GetLevelUpExp(int level) // Total Exp needed for next Level
+    int GetTotalLevelUpExp(int level) // Total Exp needed for next Level
     {
         return level * level * level;
     }
     int GetExpToNextLevel(int level) // Exp needed for next Level
     {
-        return GetLevelUpExp(level + 1) - GetLevelUpExp(level);
+        return GetTotalLevelUpExp(level + 1) - GetTotalLevelUpExp(level);
     }
 
     #endregion

@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     public TMP_Text floorText;
     [SerializeField] public TextLog textLog;
 
-    private int floor = 1;
+    public int floor = 1;
 
     private void Awake()
     {

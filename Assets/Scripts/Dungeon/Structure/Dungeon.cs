@@ -63,7 +63,6 @@ public static class Dungeon
         {
             for (int y = 0; y < height; y++)
             {
-
                 Grid[x, y].roomNum = 0;
             }
         }
@@ -74,7 +73,7 @@ public static class Dungeon
         if (pos.x < 0 || pos.y < 0)
             return false;
 
-        if (Dungeon.Grid[pos.x, pos.y].cellType == CellType.Floor || Dungeon.Grid[pos.x, pos.y].cellType == CellType.Coin || Dungeon.Grid[pos.x, pos.y].cellType == CellType.Potion || Dungeon.Grid[pos.x, pos.y].cellType == CellType.Stairs)
+        if (Grid[pos.x, pos.y].cellType == CellType.Floor || Grid[pos.x, pos.y].cellType == CellType.Coin || Grid[pos.x, pos.y].cellType == CellType.Potion || Grid[pos.x, pos.y].cellType == CellType.Stairs)
         {
             return true;
         }
@@ -82,7 +81,7 @@ public static class Dungeon
         return false;
        }
 
-    public static bool IsInsideGrid(Vector2Int position)
+    public static bool IsInsideGrid(Vector2Int position) // Checks if position is valid
     {
         return position.x >= 0 && position.y >= 0 &&
                position.x < Grid.GetLength(0) &&

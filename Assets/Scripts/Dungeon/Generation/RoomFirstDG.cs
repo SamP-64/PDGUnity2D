@@ -372,7 +372,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         for (int i = 0; i < rooms.Count; i++)
         {
             Cell cell = rooms[i].GetRandomFloorCell();
-            int index = Random.Range(0, 2); 
+            int index = Random.Range(0, 3); 
             GameObject enemyToSpawn = enemy[index];
             SpawnEnemyAtCell(enemyToSpawn, cell);
         }
@@ -382,7 +382,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         for (int i = 0; i < 10; i++)
         {
             Cell cell = rooms[monsterRoom - 1].GetRandomFloorCell();
-            int index = Random.Range(0, 2); 
+            int index = Random.Range(0, 3); 
             GameObject enemyToSpawn = enemy[index];
             SpawnEnemyAtCell(enemyToSpawn,cell);
         }
