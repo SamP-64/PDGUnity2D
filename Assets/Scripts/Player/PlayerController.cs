@@ -201,9 +201,7 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator Attack(int x, int y)
     {
-        if (x < 0 || x >= Dungeon.Grid.GetLength(0) ||
-            y < 0 || y >= Dungeon.Grid.GetLength(1))
-            yield break;
+        if (!Dungeon.IsInsideGrid(new Vector2Int(x, y))) { yield break; }
 
         TurnManager.Instance.StartTurn();
 
@@ -214,7 +212,9 @@ public class PlayerController : MonoBehaviour
 
         transform.position = Vector3.Lerp(originalPos, targetPos, 0.3f); // Move towards enemy
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.3f);  // Stay in attack position
+
+        transform.position = originalPos;
 
         if (cell.enemyOnCell != null)
         {
@@ -228,13 +228,12 @@ public class PlayerController : MonoBehaviour
                     enemyStats.defence
                 );
 
-                enemyStats.ApplyDamage(damage);
+                yield return StartCoroutine(enemyStats.ApplyDamage(damage));
+
+                yield return new WaitForSeconds(0.2f);
+
             }
         }
-
-        yield return new WaitForSeconds(0.2f);  // Stay in attack position
-
-        transform.position = originalPos;
 
         yield return new WaitForSeconds(0.05f);
 
@@ -268,11 +267,11 @@ public class PlayerController : MonoBehaviour
 
             if (cell.cellType == CellType.Wall) { break; }
 
-            if (cell.enemyOnCell != null )
+            if (cell.enemyOnCell != null)
             {
                 int dmg = DamageCalculator.CalculateDamage(playerStats.level, playerStats.attack, 50, cell.enemyOnCell.GetComponent<EnemyStats>().defence);
+                yield return StartCoroutine(cell.enemyOnCell.GetComponent<EnemyStats>().ApplyDamage(dmg));
 
-                cell.enemyOnCell.GetComponent<EnemyStats>().ApplyDamage(dmg);
                 break;
             }
 
@@ -282,7 +281,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         TurnManager.Instance.EndTurn();
-        StartCoroutine(TurnManager.Instance.NextTurn(0f));
+        StartCoroutine(TurnManager.Instance.NextTurn(0.3f));
     }
 
     void SpawnFX(Vector2Int cell, Vector2Int dir) // Spawns arrow at position

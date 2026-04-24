@@ -1,7 +1,6 @@
 using UnityEngine;
-
 using System.Collections;
-using static UnityEditor.Progress;
+
 public class EnemyStats : MonoBehaviour
 {
     public int level;
@@ -10,8 +9,9 @@ public class EnemyStats : MonoBehaviour
     public int attack;
     public int defence;
     public bool dead = false;
+
     Enemy enemy;
-    TextLog textLog;
+
     public void IntializeStats(int level, int hp, int atk, int def)
     {
        
@@ -23,32 +23,32 @@ public class EnemyStats : MonoBehaviour
 
     private void Start()
     {
-        textLog = FindObjectOfType<TextLog>();
         enemy = gameObject.GetComponent<Enemy>();
     }
 
     #region TakeDamage
-    public void ApplyDamage(int damage)
+ 
+    public IEnumerator ApplyDamage(int damage)
     {
         currentHP = currentHP - damage;
-        textLog.AddMessage("Enemy took " + damage + " damage!");
+
+        GameManager.Instance.textLog.AddMessage("Enemy took " + damage + " damage!");
         TakeDamageEffect();
-        if (currentHP <= 0)
+
+        if (currentHP <= 0 && !dead)
         {
-           // TurnManager.Instance.UnregisterEnemy(enemy);
             dead = true;
-            StartCoroutine(DieRoutine());
+            yield return StartCoroutine(DieRoutine());
         }
     }
-    #endregion 
+
+    #endregion
     #region Damage Effect
     IEnumerator DieRoutine()
     {
 
         Dungeon.Grid[enemy.gridPos.x, enemy.gridPos.y].cellType = CellType.Floor;
         yield return StartCoroutine(DieEffect());
-
-    
 
         if (enemy.collectedItem != null)
         {
@@ -61,21 +61,20 @@ public class EnemyStats : MonoBehaviour
         }
 
         Destroy(gameObject);
-        textLog.AddMessage("Player Defeated Enemy!");
+        GameManager.Instance.textLog.AddMessage("Enemy Defeated!");
         int exp = ExpCalculator.CalculateXPFast(level);
         enemy.pc.playerStats.GainExp(exp);
     }
 
-
-    Renderer renderer;
+    Renderer rend;
     Color originalColour;
     Color hitColour = Color.red;
     float flashTime = 0.1f;
 
     void Awake()
     {
-        renderer = GetComponentInChildren<Renderer>();
-        originalColour = renderer.material.color;
+        rend = GetComponentInChildren<Renderer>();
+        originalColour = rend.material.color;
 
     }
     public void TakeDamageEffect()
@@ -85,9 +84,9 @@ public class EnemyStats : MonoBehaviour
     }
     IEnumerator Flash()
     {
-        renderer.material.color = hitColour;
+        rend.material.color = hitColour;
         yield return new WaitForSeconds(flashTime);
-        renderer.material.color = originalColour;
+        rend.material.color = originalColour;
     }
 
     public IEnumerator DieEffect()
@@ -116,6 +115,7 @@ public class EnemyStats : MonoBehaviour
             yield return null;
         }
 
+        yield return new WaitForSeconds(0.3f);
         t.localScale = Vector3.zero;
     }
     #endregion
