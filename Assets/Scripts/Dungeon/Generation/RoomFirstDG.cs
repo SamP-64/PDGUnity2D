@@ -17,6 +17,8 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     [SerializeField][Range(30, 120)] public int dungeonHeight = 30;
     [SerializeField][Range(30, 120)] public int dungeonWidth = 30;
 
+    [SerializeField][Range(1, 5)] public int minRoomConnections = 2;
+
     [SerializeField] private bool randomWalkRooms = false;
 
     [SerializeField][Range(0, 6)] private int roomOffset = 1;
@@ -51,15 +53,15 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
     private void CreateRooms()
     {
-        var roomsList = DungeonGeneration.BinarySpacePartitioning(
+        var roomsList = DungeonGeneration.BinarySpacePartitioning( 
             new BoundsInt((Vector3Int)startPosition, new Vector3Int(dungeonWidth, dungeonHeight, 0)),
             minRoomWidth,
             minRoomHeight
-        );
+        );  // Generate initial room layout using Binary Space Partitioning
 
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
 
-        if (randomWalkRooms)
+        if (randomWalkRooms) // choose between quad or random rooms
         {
             floor = CreateRoomsRandomly(roomsList);
         }
@@ -72,42 +74,20 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
         foreach (var room in roomsList)
         {
-            roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
+            roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));   // Get room centres for corridor generation
         }
         HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
-        floor.UnionWith(corridors);
+        floor.UnionWith(corridors); // Connect rooms using corridors
 
-        tileMapDisplayer.PaintFloorTiles(floor);
+        tileMapDisplayer.PaintFloorTiles(floor);   // Display final dungeon layout
         WallGenerator.CreateWalls(floor, tileMapDisplayer);
 
-
         SpawnSpawnables();
-
     }
-
-    //private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomsList)
-    //{
-    //    HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
-
-    //    foreach (var room in roomsList)
-    //    {
-    //        for (int col = roomOffset; col < room.size.x - roomOffset; col++)
-    //        {
-    //            for (int row = roomOffset; row < room.size.y - roomOffset; row++)
-    //            {
-    //                Vector2Int position = (Vector2Int)room.min + new Vector2Int(col, row);
-    //                floor.Add(position);
-    //            }
-    //        }
-    //    }
-
-    //    return floor;
-    //}
-
 
     public List<Room> rooms = new List<Room>();
 
-    private HashSet<Vector2Int> CreateRoomsRandomly(List<BoundsInt> roomsList)
+    private HashSet<Vector2Int> CreateRoomsRandomly(List<BoundsInt> roomsList)   // Random walk room generation
     {
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
 
@@ -123,7 +103,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
             rooms[i].roomCenter = roomCenter;
 
-            foreach (var position in roomFloor)
+            foreach (var position in roomFloor)  // filter tiles to stay inside BSP room bounds
             {
                 if (position.x >= (roomBounds.xMin + roomOffset) &&
                     position.x <= (roomBounds.xMax - roomOffset) &&
@@ -143,7 +123,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         return floor;
     }
 
-    private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomsList)
+    private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomsList)   // Simple quadrilatteral room shape
     {
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
 
@@ -162,7 +142,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
             rooms[i].roomCenter = roomCenter;
 
-            for (int col = roomOffset; col < roomBounds.size.x - roomOffset; col++)
+            for (int col = roomOffset; col < roomBounds.size.x - roomOffset; col++)   // fill area
             {
                 for (int row = roomOffset; row < roomBounds.size.y - roomOffset; row++)
                 {
@@ -179,10 +159,10 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         rooms.RemoveAll(r => r.cells.Count == 0);
         return floor;
     }
-    private HashSet<Vector2Int> ConnectRooms(List<Vector2Int> roomCenters)
+    private HashSet<Vector2Int> ConnectRooms(List<Vector2Int> roomCenters) // Connect all rooms 
     {
         HashSet<Vector2Int> corridors = new HashSet<Vector2Int>();
-        Dictionary<Vector2Int, HashSet<Vector2Int>> connections = new Dictionary<Vector2Int, HashSet<Vector2Int>>();
+        Dictionary<Vector2Int, HashSet<Vector2Int>> connections = new Dictionary<Vector2Int, HashSet<Vector2Int>>(); // Tracks room connections 
 
         foreach (var room in roomCenters)
         {
@@ -192,17 +172,17 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         List<Vector2Int> connectedRooms = new List<Vector2Int>();
         List<Vector2Int> unconnectedRooms = new List<Vector2Int>(roomCenters);
 
-        Vector2Int startRoom = unconnectedRooms[Random.Range(0, unconnectedRooms.Count)];
+        Vector2Int startRoom = unconnectedRooms[Random.Range(0, unconnectedRooms.Count)];   // Start from a random room
         connectedRooms.Add(startRoom);
         unconnectedRooms.Remove(startRoom);
 
-        while (unconnectedRooms.Count > 0)
+        while (unconnectedRooms.Count > 0)  // Connect all rooms (ensures full connectivity)
         {
             Vector2Int bestConnectedRoom = Vector2Int.zero;
             Vector2Int bestUnconnectedRoom = Vector2Int.zero;
             float bestDistance = float.MaxValue;
 
-            foreach (var connectedRoom in connectedRooms)
+            foreach (var connectedRoom in connectedRooms) // Find closest pair of unconnected rooms
             {
                 foreach (var unconnectedRoom in unconnectedRooms)
                 {
@@ -217,7 +197,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
                 }
             }
 
-            corridors.UnionWith(CreateCorridor(bestConnectedRoom, bestUnconnectedRoom));
+            corridors.UnionWith(CreateCorridor(bestConnectedRoom + new Vector2Int(1,0), bestUnconnectedRoom + new Vector2Int(-1, 0)));
 
             connections[bestConnectedRoom].Add(bestUnconnectedRoom);
             connections[bestUnconnectedRoom].Add(bestConnectedRoom);
@@ -226,9 +206,9 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             unconnectedRooms.Remove(bestUnconnectedRoom);
         }
 
-        foreach (var roomCenter in roomCenters)
+        foreach (var roomCenter in roomCenters)  // Add extra connections for multiple paths
         {
-            while (connections[roomCenter].Count < 2)
+            while (connections[roomCenter].Count < minRoomConnections)
             {
                 Vector2Int closestRoom = FindClosestRoomNotConnected(roomCenter, roomCenters, connections[roomCenter]);
 
@@ -247,7 +227,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         return corridors;
     }
 
-    private Vector2Int FindClosestRoomNotConnected(Vector2Int currentRoom, List<Vector2Int> roomCenters, HashSet<Vector2Int> alreadyConnected)
+    private Vector2Int FindClosestRoomNotConnected(Vector2Int currentRoom, List<Vector2Int> roomCenters, HashSet<Vector2Int> alreadyConnected) // Finds the nearest room that is not already connected to the current room
     {
         Vector2Int closestRoom = currentRoom;
         float closestDistance = float.MaxValue;
@@ -271,7 +251,8 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         return closestRoom;
     }
 
-    private HashSet<Vector2Int> CreateCorridor(Vector2Int currentRoomCenter, Vector2Int closestPoint)
+   
+    private HashSet<Vector2Int> CreateCorridor(Vector2Int currentRoomCenter, Vector2Int closestPoint) // Creates a straight or L shaped corridoor
     {
         HashSet<Vector2Int> corridor = new HashSet<Vector2Int>();
         var position = currentRoomCenter;
@@ -400,7 +381,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             SpawnEnemyAtCell(enemyToSpawn, cell);
         }
     }
-    public void SpawnMonsterHouse()
+    public void SpawnMonsterHouse() // Room where 6 extra enemies spawn
     {
         for (int i = 0; i < 6; i++)
         {

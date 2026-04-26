@@ -11,5 +11,9 @@ public class Cell
     public GameObject enemyOnCell;
     public bool walkable = true;
     public bool isStairs;
-   
+
+    public Vector2Int GetPosition()
+    {
+        return new Vector2Int(x, y);
+    }
 }
