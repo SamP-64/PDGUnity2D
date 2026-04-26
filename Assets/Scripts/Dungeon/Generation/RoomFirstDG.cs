@@ -301,8 +301,6 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
     private void SpawnPlayer()
     {
-        Debug.Log("spawned player");
-
         Room firstRoom = rooms[0];
         Cell cell = Dungeon.Grid[firstRoom.roomCenter.x, firstRoom.roomCenter.y];
         player.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);

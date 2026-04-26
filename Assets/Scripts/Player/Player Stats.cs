@@ -43,6 +43,8 @@ public class PlayerStats : MonoBehaviour
         currentHP = currentHP - damage;
         currentHP = Mathf.Max(currentHP, 0);
 
+        GameManager.Instance.textLog.AddMessage("Player took " + damage + " damage!");
+
         if (currentHP == 0)
         {
             GameManager.Instance.PlayerDie();

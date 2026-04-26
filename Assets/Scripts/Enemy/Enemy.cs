@@ -46,7 +46,6 @@ public class Enemy : MonoBehaviour
             return false;
         }
     }
-
     public IEnumerator RangedAttack() // Snake ranged attack
     {
         GameManager.Instance.textLog.AddMessage("Enemy Snake Shoots!");
@@ -210,7 +209,6 @@ public class Enemy : MonoBehaviour
 
         if (cell.itemOnCell != null && cell.itemOnCell.TryGetComponent<Item>(out var item))
         {
-            Debug.Log("Destroy");
             collectedItem = cell.itemOnCell;
             collectedItem.gameObject.SetActive(false);
         }
@@ -365,8 +363,6 @@ public class Enemy : MonoBehaviour
         int damage = DamageCalculator.CalculateDamage(enemyStats.level, enemyStats.attack, meleePower, ps.level); // Use the formula to calculate damage
 
         ps.ApplyDamage(damage); // apply damage to the player
-
-        GameManager.Instance.textLog.AddMessage("Player took " + damage + " damage!");
 
         yield return new WaitForSeconds(0.5f);
 

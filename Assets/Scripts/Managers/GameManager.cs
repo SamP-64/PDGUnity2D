@@ -16,13 +16,11 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
-
     }
 
     public void NextFloor(RoomFirstDG dungeonGenerator) // When the Player moves to the stairs
@@ -33,7 +31,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("next");
     }
 
-    public void PlayerDie()
+    public void PlayerDie() // resets the game
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }

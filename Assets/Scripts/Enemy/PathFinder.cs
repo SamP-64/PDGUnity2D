@@ -53,8 +53,9 @@ public static class Pathfinder
                 Vector2Int nextPos = current.pos + dir;
 
                 if (!IsWalkable(nextPos) || closed.Contains(nextPos))
+                {
                     continue;
-
+                }
                 int newG = current.g + 1;
 
                 Node existing = open.Find(n => n.pos == nextPos);
