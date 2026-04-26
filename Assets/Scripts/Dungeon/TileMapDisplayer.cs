@@ -124,13 +124,24 @@ public class TileMapDisplayer : MonoBehaviour
         DestroySpawnables();
     }
 
-    private void DestroySpawnables() // Destroys all spawned gameobjects
+    private void DestroySpawnables()
     {
-
         Spawnable[] spawnables = FindObjectsByType<Spawnable>(FindObjectsSortMode.None);
+
         foreach (Spawnable item in spawnables)
         {
-            Destroy(item.gameObject);
+            if (item == null) continue;
+
+            GameObject obj = item.gameObject; 
+
+            if (Application.isPlaying)
+            {
+                Destroy(obj);
+            }
+            else
+            {
+                DestroyImmediate(obj);
+            }
         }
     }
     #endregion

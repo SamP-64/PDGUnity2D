@@ -33,13 +33,13 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     private GameObject potion;
 
     [SerializeField]
-    private GameObject[] enemy;
-
-    [SerializeField]
     private GameObject coin;
 
     [SerializeField]
     private GameObject npc;
+
+    [SerializeField]
+    private GameObject[] enemy;
 
     #region Dungeon Generation
 
@@ -94,7 +94,6 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         SpawnSpawnables();
 
     }
-
 
     private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomsList)
     {
@@ -283,10 +282,9 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     }
 
     #endregion
-
     #region Spawnables
     
-    public int monsterRoom;
+   [HideInInspector] public int monsterRoom;
     private void SpawnSpawnables()
     {
         monsterRoom = Random.Range(1, rooms.Count);
@@ -395,8 +393,10 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         Dungeon.Grid[cell.x, cell.y].enemyOnCell = enemyRef;
 
         Enemy enemyScript = enemyRef.GetComponent<Enemy>();
-        TurnManager.Instance.RegisterEnemy(enemyScript);
-
+        if (Application.isPlaying && TurnManager.Instance != null)
+        {
+            TurnManager.Instance.RegisterEnemy(enemyScript);
+        }
         enemyScript.SetStartPosition(new Vector2Int(cell.x, cell.y));
     }
     #endregion

@@ -13,13 +13,8 @@ public class CorridorFirstDG : RandomWalkDungeonGenerator
     [Range(0.1f,1f)]
     private float roomPercent = 0.8f;
 
-   // [SerializeField]
-   // public int dungeonWidth = 20, dungeonHeight = 20;
-
     protected override void RunProceduralGeneration()
     {
-
-      //  Dungeon.Initialize(dungeonHeight, dungeonWidth);
         CorridorFirstGeneration();
     }
 

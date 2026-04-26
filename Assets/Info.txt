@@ -1,0 +1,7 @@
+Movement - WASD (hold to increase speed)
+Attack - Directional arrows - If an enemy is 1 tile above you, press up to attack.
+Shoot Arrows - IJKL for each direction.
+
+Find the stairs to progress to the next floor.
+
+Custom dungeon values can be entered into the script of the 'RoomFirstGenerator' gameobject.

@@ -84,7 +84,9 @@ public class TurnManager : MonoBehaviour
     public void RegisterEnemy(Enemy enemy)
     {
         if (!enemies.Contains(enemy))
+        {
             enemies.Add(enemy);
+        }
     }
 
     public void UnregisterEnemy(Enemy enemy)
