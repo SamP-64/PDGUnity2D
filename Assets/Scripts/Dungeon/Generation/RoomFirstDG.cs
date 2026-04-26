@@ -8,38 +8,28 @@ using Random = UnityEngine.Random;
 
 public class RoomFirstDG : RandomWalkDungeonGenerator
 {
-    [SerializeField]
-    [Range(4, 40)]
-    private int minRoomWidth = 4, minRoomHeight = 4;
 
-    [SerializeField]
-    [Range(30, 120)]
-    public int dungeonWidth = 30, dungeonHeight = 30;
+    [Header("Dungeon Settings")]
+   
+    [SerializeField][Range(4, 40)] private int minRoomHeight = 4;
+    [SerializeField][Range(4, 40)] private int minRoomWidth = 4;
 
-    [SerializeField]
-    private bool randomWalkRooms = false;
+    [SerializeField][Range(30, 120)] public int dungeonHeight = 30;
+    [SerializeField][Range(30, 120)] public int dungeonWidth = 30;
 
-    [SerializeField]
-    [Range(0, 10)]
-    private int roomOffset = 1;
+    [SerializeField] private bool randomWalkRooms = false;
 
-    [SerializeField]
-    private GameObject player;
+    [SerializeField][Range(0, 5)] private int roomOffset = 1;
 
-    [SerializeField]
-    private GameObject stairs;
+    [Header("Spawned Objects")]
 
-    [SerializeField]
-    private GameObject potion;
-
-    [SerializeField]
-    private GameObject coin;
-
-    [SerializeField]
-    private GameObject npc;
-
-    [SerializeField]
-    private GameObject[] enemy;
+    [SerializeField] private Transform spawnedFolder;
+    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject stairs;
+    [SerializeField] private GameObject potion;
+    [SerializeField] private GameObject coin;
+    [SerializeField] private GameObject npc;
+    [SerializeField] private GameObject[] enemy;
 
     #region Dungeon Generation
 
@@ -148,7 +138,6 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
                 }
             }
         }
-
         return floor;
     }
 
@@ -315,7 +304,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         for (int i = 0; i < rooms.Count; i++)
         {
            Cell cell = rooms[i].GetRandomFloorCell();
-           GameObject potionRef = Instantiate(potion, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+           GameObject potionRef = Instantiate(potion, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity, spawnedFolder);
            potionRef.GetComponent<Spawnable>().x = cell.x;
            potionRef.GetComponent<Spawnable>().y = cell.y;
            Dungeon.Grid[cell.x, cell.y].cellType = CellType.Potion;
@@ -331,7 +320,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
             if (i == npcRoom)
             {
                 Cell cell = rooms[i].GetRandomFloorCell();
-                GameObject npcRef = Instantiate(npc, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+                GameObject npcRef = Instantiate(npc, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity, spawnedFolder);
                 npcRef.GetComponent<Spawnable>().x = cell.x;
                 npcRef.GetComponent<Spawnable>().y = cell.y;
                 Dungeon.Grid[cell.x, cell.y].cellType = CellType.npc;
@@ -345,7 +334,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         for (int i = 0; i < rooms.Count; i++)
         {
             Cell cell = rooms[i].GetRandomFloorCell();
-            GameObject coinRef = Instantiate(coin, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+            GameObject coinRef = Instantiate(coin, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity, spawnedFolder);
             coinRef.GetComponent<Spawnable>().x = cell.x;
             coinRef.GetComponent<Spawnable>().y = cell.y;
             Dungeon.Grid[cell.x, cell.y].cellType = CellType.Coin;
@@ -356,10 +345,9 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     private void SpawnStairs()
     {
         Cell cell = rooms[rooms.Count - 1].GetRandomFloorCell();
-        Instantiate(stairs, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+        Instantiate(stairs, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity, spawnedFolder );
         Dungeon.Grid[cell.x, cell.y].cellType = CellType.Stairs;
         Dungeon.Grid[cell.x, cell.y].isStairs = true;
-
     }
 
     private void SpawnEnemies()
@@ -387,7 +375,20 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
     void SpawnEnemyAtCell(GameObject chosenEnemy, Cell cell)
     {
-        GameObject enemyRef = Instantiate(chosenEnemy, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity);
+
+        if (chosenEnemy == null)
+        {
+            Debug.LogError("Enemy prefab is null");
+            return;
+        }
+
+        if (cell == null)
+        {
+            Debug.LogError("Cell is null");
+            return;
+        }
+
+        GameObject enemyRef = Instantiate(chosenEnemy, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity, spawnedFolder);
 
         Dungeon.Grid[cell.x, cell.y].cellType = CellType.Enemy;
         Dungeon.Grid[cell.x, cell.y].enemyOnCell = enemyRef;
