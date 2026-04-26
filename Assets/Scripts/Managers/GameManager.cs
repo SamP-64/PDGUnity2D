@@ -32,4 +32,9 @@ public class GameManager : MonoBehaviour
         floorText.text = "Floor : " + floor;
         Debug.Log("next");
     }
+
+    public void PlayerDie()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
 }

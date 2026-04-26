@@ -1,7 +1,7 @@
-using UnityEngine;
-
 using System.Collections;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -43,10 +43,16 @@ public class PlayerStats : MonoBehaviour
         currentHP = currentHP - damage;
         currentHP = Mathf.Max(currentHP, 0);
 
+        if (currentHP == 0)
+        {
+            GameManager.Instance.PlayerDie();
+        }
+
         UpdateText();
         TakeDamageEffect();
     }
 
+    
     public void RestoreHealth(int restoreValue) // Method to increase player health
     {
         currentHP = currentHP + restoreValue;

@@ -14,10 +14,11 @@ public class EnemyStats : MonoBehaviour
 
     Enemy enemy;
 
-    public void IntializeStats(int level, int hp, int atk, int def)
+    public void InitializeStats(int level, int hp, int atk, int def)
     {
         int floor = GameManager.Instance.floor;
-        this.level = level + floor;
+        Debug.Log(floor);
+        this.level = level + floor - 1;
         this.maxHP = hp + ( 3 * floor);
         this.currentHP = hp + (3 * floor) ;
         this.attack = atk * floor;
@@ -27,6 +28,7 @@ public class EnemyStats : MonoBehaviour
     private void Start()
     {
         enemy = gameObject.GetComponent<Enemy>();
+        InitializeStats(level, maxHP, attack , defence);
        
     }
 

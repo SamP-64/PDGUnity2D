@@ -269,7 +269,7 @@ public class PlayerController : MonoBehaviour
 
             if (cell.enemyOnCell != null)
             {
-                int dmg = DamageCalculator.CalculateDamage(playerStats.level, playerStats.attack, 50, cell.enemyOnCell.GetComponent<EnemyStats>().defence);
+                int dmg = DamageCalculator.CalculateDamage(playerStats.level, playerStats.attack, 30, cell.enemyOnCell.GetComponent<EnemyStats>().defence);
                 yield return StartCoroutine(cell.enemyOnCell.GetComponent<EnemyStats>().ApplyDamage(dmg));
 
                 break;

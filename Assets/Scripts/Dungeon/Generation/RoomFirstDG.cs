@@ -378,7 +378,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     }
     public void SpawnMonsterHouse()
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 6; i++)
         {
             Cell cell = rooms[monsterRoom - 1].GetRandomFloorCell();
             int index = Random.Range(0, 3); 
