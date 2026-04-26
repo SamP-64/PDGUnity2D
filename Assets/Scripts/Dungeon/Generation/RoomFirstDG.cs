@@ -19,7 +19,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
     [SerializeField] private bool randomWalkRooms = false;
 
-    [SerializeField][Range(0, 5)] private int roomOffset = 1;
+    [SerializeField][Range(0, 6)] private int roomOffset = 1;
 
     [Header("Spawned Objects")]
 
@@ -85,24 +85,24 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
     }
 
-    private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomsList)
-    {
-        HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
+    //private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomsList)
+    //{
+    //    HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
 
-        foreach (var room in roomsList)
-        {
-            for (int col = roomOffset; col < room.size.x - roomOffset; col++)
-            {
-                for (int row = roomOffset; row < room.size.y - roomOffset; row++)
-                {
-                    Vector2Int position = (Vector2Int)room.min + new Vector2Int(col, row);
-                    floor.Add(position);
-                }
-            }
-        }
+    //    foreach (var room in roomsList)
+    //    {
+    //        for (int col = roomOffset; col < room.size.x - roomOffset; col++)
+    //        {
+    //            for (int row = roomOffset; row < room.size.y - roomOffset; row++)
+    //            {
+    //                Vector2Int position = (Vector2Int)room.min + new Vector2Int(col, row);
+    //                floor.Add(position);
+    //            }
+    //        }
+    //    }
 
-        return floor;
-    }
+    //    return floor;
+    //}
 
 
     public List<Room> rooms = new List<Room>();
@@ -138,9 +138,47 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
                 }
             }
         }
+        rooms.RemoveAll(r => r.cells.Count == 0); // removes all rooms whith no floor
+
         return floor;
     }
 
+    private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomsList)
+    {
+        HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
+
+        rooms.Clear();
+
+        for (int i = 0; i < roomsList.Count; i++)
+        {
+            var roomBounds = roomsList[i];
+
+            rooms.Add(new Room(i));
+
+            var roomCenter = new Vector2Int(
+                Mathf.RoundToInt(roomBounds.center.x),
+                Mathf.RoundToInt(roomBounds.center.y)
+            );
+
+            rooms[i].roomCenter = roomCenter;
+
+            for (int col = roomOffset; col < roomBounds.size.x - roomOffset; col++)
+            {
+                for (int row = roomOffset; row < roomBounds.size.y - roomOffset; row++)
+                {
+                    Vector2Int position = (Vector2Int)roomBounds.min + new Vector2Int(col, row);
+                    floor.Add(position);
+
+                    Cell cell = Dungeon.Grid[position.x, position.y];
+                    rooms[i].cells.Add(cell);
+                    cell.roomNum = i + 1;
+                }
+            }
+        }
+
+        rooms.RemoveAll(r => r.cells.Count == 0);
+        return floor;
+    }
     private HashSet<Vector2Int> ConnectRooms(List<Vector2Int> roomCenters)
     {
         HashSet<Vector2Int> corridors = new HashSet<Vector2Int>();
@@ -304,6 +342,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         for (int i = 0; i < rooms.Count; i++)
         {
            Cell cell = rooms[i].GetRandomFloorCell();
+           if (cell == null) {continue;}
            GameObject potionRef = Instantiate(potion, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity, spawnedFolder);
            potionRef.GetComponent<Spawnable>().x = cell.x;
            potionRef.GetComponent<Spawnable>().y = cell.y;
@@ -334,6 +373,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         for (int i = 0; i < rooms.Count; i++)
         {
             Cell cell = rooms[i].GetRandomFloorCell();
+            if (cell == null) { continue; }
             GameObject coinRef = Instantiate(coin, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity, spawnedFolder);
             coinRef.GetComponent<Spawnable>().x = cell.x;
             coinRef.GetComponent<Spawnable>().y = cell.y;
@@ -355,7 +395,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         for (int i = 0; i < rooms.Count; i++)
         {
             Cell cell = rooms[i].GetRandomFloorCell();
-            int index = Random.Range(0, 3); 
+            int index = Random.Range(0, enemy.Length); 
             GameObject enemyToSpawn = enemy[index];
             SpawnEnemyAtCell(enemyToSpawn, cell);
         }
@@ -365,7 +405,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         for (int i = 0; i < 6; i++)
         {
             Cell cell = rooms[monsterRoom - 1].GetRandomFloorCell();
-            int index = Random.Range(0, 3); 
+            int index = Random.Range(0, enemy.Length); 
             GameObject enemyToSpawn = enemy[index];
             SpawnEnemyAtCell(enemyToSpawn,cell);
         }
@@ -375,18 +415,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
 
     void SpawnEnemyAtCell(GameObject chosenEnemy, Cell cell)
     {
-
-        if (chosenEnemy == null)
-        {
-            Debug.LogError("Enemy prefab is null");
-            return;
-        }
-
-        if (cell == null)
-        {
-            Debug.LogError("Cell is null");
-            return;
-        }
+        if (cell == null) { return; }
 
         GameObject enemyRef = Instantiate(chosenEnemy, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), Quaternion.identity, spawnedFolder);
 
