@@ -17,11 +17,11 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     [SerializeField][Range(30, 120)] public int dungeonHeight = 30;
     [SerializeField][Range(30, 120)] public int dungeonWidth = 30;
 
-    [SerializeField][Range(1, 5)] public int minRoomConnections = 2;
+    [SerializeField][Range(1, 5)] public int minRoomConnections = 2; // number of paths from each room (these can overlap currently)
 
-    [SerializeField] private bool randomWalkRooms = false;
+    [SerializeField] private bool randomWalkRooms = false; // for each individual room to be generated randomly or not
 
-    [SerializeField][Range(0, 6)] private int roomOffset = 1;
+    [SerializeField][Range(0, 6)] private int roomOffset = 1; // offset from bsp bounds
 
     [Header("Spawned Objects")]
 
