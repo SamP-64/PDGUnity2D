@@ -1,8 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-
 public class TileMapDisplayer : MonoBehaviour
 {
     [SerializeField] private Tilemap floorTileMap, wallTileMap;
@@ -15,18 +16,38 @@ public class TileMapDisplayer : MonoBehaviour
     wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft;
 
     #region Paint Tiles
-    public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions)
+    public void PaintAllFloorTiles(IEnumerable<Vector2Int> floorPositions)
     {
-        PaintFloorTiles(floorPositions, floorTileMap, floorTile);
+         PaintFloorTiles(floorPositions, floorTileMap, floorTile);
     }
 
     private void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Tilemap floorTileMap, TileBase floorTile) // paints all floors in floorpositions
     {
-        foreach (var position in floorPositions) 
+        foreach (var position in floorPositions)
         {
             PaintSingleTile(floorTileMap, floorTile, position);
             Dungeon.Grid[position.x, position.y].cellType = CellType.Floor;
-        } 
+        }
+    }
+
+    public IEnumerator PaintFloorTilesStepByStep(IEnumerable<Vector2Int> floorPositions, RoomFirstDG dg) // shows generation step by step (only from play mode)
+    {
+        yield return new WaitForSeconds(5f);
+
+        foreach (var position in floorPositions)
+        {
+            PaintSingleTile(floorTileMap, floorTile, position);
+            Dungeon.Grid[position.x, position.y].cellType = CellType.Floor;
+
+            yield return new WaitForSeconds(0.01f); 
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        WallGenerator.CreateWalls(new HashSet<Vector2Int>(floorPositions), this);
+
+        yield return new WaitForSeconds(2f);
+        dg.SpawnSpawnables();
     }
 
     private void PaintSingleTile(Tilemap floorTileMap, TileBase floorTile, Vector2Int position) // Paints a custom tile

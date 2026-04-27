@@ -23,6 +23,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            QuitGame();
+        }
+    }
+
+    private void QuitGame()
+    {
+        Application.Quit();
+    }
+
     public void NextFloor(RoomFirstDG dungeonGenerator) // When the Player moves to the stairs
     {
         dungeonGenerator.GenerateDungeon();

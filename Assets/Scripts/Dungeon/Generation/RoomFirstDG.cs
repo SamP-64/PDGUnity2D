@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -17,6 +18,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     [SerializeField][Range(1, 5)] public int minRoomConnections = 2; // number of paths from each room (these can overlap currently)
 
     [SerializeField] private bool randomWalkRooms = false; // for each individual room to be generated randomly or not
+    [SerializeField] private bool showStepByStep = false;
 
     [SerializeField][Range(0, 6)] private int roomOffset = 1; // offset from bsp bounds
 
@@ -76,12 +78,27 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
         HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
         floor.UnionWith(corridors); // Connect rooms using corridors
 
-        tileMapDisplayer.PaintFloorTiles(floor);   // Display final dungeon layout
-        WallGenerator.CreateWalls(floor, tileMapDisplayer);
 
-        SpawnSpawnables();
+        if (generateRoutine != null)
+        {
+            StopCoroutine(generateRoutine);
+            generateRoutine = null;
+        }
+
+        if (showStepByStep)
+        {
+            
+            generateRoutine = StartCoroutine(tileMapDisplayer.PaintFloorTilesStepByStep(floor, this));
+        }
+        else
+        {
+            tileMapDisplayer.PaintAllFloorTiles(floor);   // Display final dungeon layout
+            WallGenerator.CreateWalls(floor, tileMapDisplayer);
+            SpawnSpawnables();
+        }
+
     }
-
+    private Coroutine generateRoutine;
     public List<Room> rooms = new List<Room>();
 
     private HashSet<Vector2Int> CreateRoomsRandomly(List<BoundsInt> roomsList)   // Random walk room generation
@@ -290,7 +307,7 @@ public class RoomFirstDG : RandomWalkDungeonGenerator
     #region Spawnables
     
    [HideInInspector] public int monsterRoom;
-    private void SpawnSpawnables()
+    public void SpawnSpawnables()
     {
         monsterRoom = Random.Range(1, rooms.Count);
         SpawnNPC();

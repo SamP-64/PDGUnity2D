@@ -15,7 +15,7 @@ public class RandomWalkDungeonGenerator : AbstractDungeonGenerator
 
         HashSet<Vector2Int> floorPositions = RunRandomWalk(startPosition, randomWalkParameters);    // Generate all floor tiles using the random walk algorithm
         tileMapDisplayer.ClearTileMap();
-        tileMapDisplayer.PaintFloorTiles(floorPositions);
+        tileMapDisplayer.PaintAllFloorTiles(floorPositions);
         WallGenerator.CreateWalls(floorPositions, tileMapDisplayer);   // Automatically place walls around the floor
     }
 

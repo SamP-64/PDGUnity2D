@@ -13,6 +13,8 @@ public static class WallGenerator
         CreateCornerWalls(tileMapDisplayer, cornerWallPositions, floorPositions);
     }
 
+
+
     private static void CreateCornerWalls(TileMapDisplayer tileMapDisplayer, HashSet<Vector2Int> cornerWallPositions, HashSet<Vector2Int> floorPositions)
     {
         foreach (var position in cornerWallPositions) // check all walls
